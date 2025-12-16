@@ -172,6 +172,17 @@ class Car:
         conn.close()
     
     @staticmethod
+    def update(car_id, model, plate_number):
+        conn = get_db()
+        cursor = conn.cursor()
+        cursor.execute(
+            "UPDATE cars SET model = ?, plate_number = ? WHERE id = ?",
+            (model, plate_number, car_id)
+        )
+        conn.commit()
+        conn.close()
+    
+    @staticmethod
     def delete(car_id):
         conn = get_db()
         cursor = conn.cursor()
@@ -234,6 +245,17 @@ class Client:
             cursor.execute("UPDATE clients SET passport_image = ? WHERE id = ?", (passport_image, client_id))
         if license_image:
             cursor.execute("UPDATE clients SET license_image = ? WHERE id = ?", (license_image, client_id))
+        conn.commit()
+        conn.close()
+    
+    @staticmethod
+    def update(client_id, full_name, passport_id, driving_license):
+        conn = get_db()
+        cursor = conn.cursor()
+        cursor.execute(
+            "UPDATE clients SET full_name = ?, passport_id = ?, driving_license = ? WHERE id = ?",
+            (full_name, passport_id, driving_license, client_id)
+        )
         conn.commit()
         conn.close()
     

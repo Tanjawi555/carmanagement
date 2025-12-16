@@ -125,6 +125,20 @@ def delete_car(car_id):
     Car.delete(car_id)
     return redirect(url_for('cars'))
 
+@app.route('/cars/<int:car_id>/edit', methods=['POST'])
+@login_required
+def edit_car(car_id):
+    t = get_all_translations(get_lang())
+    model = request.form.get('model')
+    plate_number = request.form.get('plate_number')
+    if model and plate_number:
+        try:
+            Car.update(car_id, model, plate_number)
+            flash(t['success'], 'success')
+        except:
+            flash(t['error'], 'danger')
+    return redirect(url_for('cars'))
+
 @app.route('/clients', methods=['GET', 'POST'])
 @login_required
 def clients():
@@ -181,6 +195,21 @@ def clients():
 @login_required
 def delete_client(client_id):
     Client.delete(client_id)
+    return redirect(url_for('clients'))
+
+@app.route('/clients/<int:client_id>/edit', methods=['POST'])
+@login_required
+def edit_client(client_id):
+    t = get_all_translations(get_lang())
+    full_name = request.form.get('full_name')
+    passport_id = request.form.get('passport_id')
+    driving_license = request.form.get('driving_license')
+    if full_name and passport_id and driving_license:
+        try:
+            Client.update(client_id, full_name, passport_id, driving_license)
+            flash(t['success'], 'success')
+        except:
+            flash(t['error'], 'danger')
     return redirect(url_for('clients'))
 
 @app.route('/document/<filename>')
