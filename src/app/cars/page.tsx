@@ -11,6 +11,10 @@ interface Car {
   model: string;
   plate_number: string;
   status: 'available' | 'rented' | 'reserved';
+  current_rental?: {
+    start_date: string;
+    return_date: string;
+  };
 }
 
 export default function CarsPage() {
@@ -181,8 +185,26 @@ export default function CarsPage() {
                         <td><code>{car.plate_number}</code></td>
                         <td>
                           {car.status === 'available' && <span className="badge bg-success">{t.available}</span>}
-                          {car.status === 'rented' && <span className="badge bg-info">{t.rented}</span>}
-                          {car.status === 'reserved' && <span className="badge bg-warning text-dark">{t.reserved}</span>}
+                          {car.status === 'rented' && (
+                            <div className="d-flex flex-column align-items-start">
+                              <span className="badge bg-info mb-1">{t.rented}</span>
+                              {car.current_rental && (
+                                <small className="text-muted" style={{ fontSize: '0.75rem' }}>
+                                  {car.current_rental.start_date} <i className="bi bi-arrow-right-short"></i> {car.current_rental.return_date}
+                                </small>
+                              )}
+                            </div>
+                          )}
+                          {car.status === 'reserved' && (
+                             <div className="d-flex flex-column align-items-start">
+                              <span className="badge bg-warning text-dark mb-1">{t.reserved}</span>
+                              {car.current_rental && (
+                                <small className="text-muted" style={{ fontSize: '0.75rem' }}>
+                                  {car.current_rental.start_date} <i className="bi bi-arrow-right-short"></i> {car.current_rental.return_date}
+                                </small>
+                              )}
+                            </div>
+                          )}
                         </td>
                         <td>
                           <div className="btn-group btn-group-sm">

@@ -45,16 +45,45 @@ export async function PUT(request: NextRequest) {
   }
 
   const body = await request.json();
-  const { id, status } = body;
+  // Check if it's just a status update or a full edit
+  const { id, status, car_id, client_id, start_date, return_date, rental_price } = body;
 
-  if (!id || !status) {
-    return NextResponse.json({ error: 'Missing fields' }, { status: 400 });
+  if (!id) {
+    return NextResponse.json({ error: 'Missing id' }, { status: 400 });
   }
 
   try {
-    await RentalModel.updateStatus(id, status);
+    if (status) {
+      await RentalModel.updateStatus(id, status);
+    } else {
+      if (!car_id || !client_id || !start_date || !return_date) {
+        return NextResponse.json({ error: 'Missing fields' }, { status: 400 });
+      }
+      await RentalModel.update(id, car_id, client_id, start_date, return_date, parseFloat(rental_price) || 0);
+    }
     return NextResponse.json({ success: true });
   } catch (error) {
     return NextResponse.json({ error: 'Failed to update rental' }, { status: 500 });
+  }
+}
+
+export async function DELETE(request: NextRequest) {
+  const session = await getServerSession(authOptions);
+  if (!session) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  const { searchParams } = new URL(request.url);
+  const id = searchParams.get('id');
+
+  if (!id) {
+    return NextResponse.json({ error: 'Missing id' }, { status: 400 });
+  }
+
+  try {
+    await RentalModel.delete(id);
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    return NextResponse.json({ error: 'Failed to delete rental' }, { status: 500 });
   }
 }

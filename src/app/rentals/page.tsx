@@ -19,6 +19,8 @@ interface Client {
 
 interface Rental {
   _id: string;
+  car_id: string;
+  client_id: string;
   car_model: string;
   plate_number: string;
   client_name: string;
@@ -45,6 +47,7 @@ export default function RentalsPage() {
     return_date: new Date().toISOString().split('T')[0],
     rental_price: '',
   });
+  const [editingRental, setEditingRental] = useState<Rental | null>(null);
   const [message, setMessage] = useState<{ type: string; text: string } | null>(null);
 
   useEffect(() => {
@@ -100,13 +103,23 @@ export default function RentalsPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await fetch('/api/rentals', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      });
+      if (editingRental) {
+        await fetch('/api/rentals', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: editingRental._id, ...formData }),
+        });
+      } else {
+        await fetch('/api/rentals', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData),
+        });
+      }
+
       showMessage_('success', t.success);
       setShowModal(false);
+      setEditingRental(null);
       setFormData({
         car_id: '',
         client_id: '',
@@ -131,6 +144,29 @@ export default function RentalsPage() {
     } catch (error) {
       showMessage_('danger', t.error);
     }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm(t.confirm_delete)) return;
+    try {
+      await fetch(`/api/rentals?id=${id}`, { method: 'DELETE' });
+      showMessage_('success', t.success);
+      fetchData();
+    } catch (error) {
+      showMessage_('danger', t.error);
+    }
+  };
+
+  const handleEdit = (rental: Rental) => {
+    setEditingRental(rental);
+    setFormData({
+      car_id: rental.car_id, // We need to ensure rental object has car_id and client_id. The interface might need update or we rely on them being there.
+      client_id: rental.client_id,
+      start_date: rental.start_date,
+      return_date: rental.return_date,
+      rental_price: rental.rental_price.toString(),
+    });
+    setShowModal(true);
   };
 
   if (status === 'loading' || loading) {
@@ -158,7 +194,17 @@ export default function RentalsPage() {
 
         <div className="d-flex justify-content-between align-items-center mb-4">
           <h2><i className="bi bi-calendar-check"></i> {t.rentals}</h2>
-          <button className="btn btn-primary" onClick={() => setShowModal(true)}>
+          <button className="btn btn-primary" onClick={() => {
+            setEditingRental(null);
+            setFormData({
+              car_id: '',
+              client_id: '',
+              start_date: new Date().toISOString().split('T')[0],
+              return_date: new Date().toISOString().split('T')[0],
+              rental_price: '',
+            });
+            setShowModal(true);
+          }}>
             <i className="bi bi-plus-circle"></i> {t.add_rental}
           </button>
         </div>
@@ -206,6 +252,12 @@ export default function RentalsPage() {
                                 <i className="bi bi-check-circle"></i>
                               </button>
                             )}
+                            <button onClick={() => handleEdit(rental)} className="btn btn-outline-secondary" title={t.edit}>
+                              <i className="bi bi-pencil"></i>
+                            </button>
+                            <button onClick={() => handleDelete(rental._id)} className="btn btn-outline-danger" title={t.delete}>
+                              <i className="bi bi-trash"></i>
+                            </button>
                           </div>
                         </td>
                       </tr>
@@ -225,7 +277,7 @@ export default function RentalsPage() {
               <div className="modal-content">
                 <form onSubmit={handleSubmit}>
                   <div className="modal-header">
-                    <h5 className="modal-title">{t.add_rental}</h5>
+                    <h5 className="modal-title">{editingRental ? t.edit : t.add_rental}</h5>
                     <button type="button" className="btn-close" onClick={() => setShowModal(false)} />
                   </div>
                   <div className="modal-body">

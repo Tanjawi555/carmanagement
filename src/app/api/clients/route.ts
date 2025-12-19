@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
   const body = await request.json();
   const { full_name, passport_id, driving_license, passport_image, license_image } = body;
 
-  if (!full_name || !passport_id || !driving_license) {
+  if (!full_name) {
     return NextResponse.json({ error: 'Missing fields' }, { status: 400 });
   }
 
@@ -43,7 +43,7 @@ export async function PUT(request: NextRequest) {
   const body = await request.json();
   const { id, full_name, passport_id, driving_license } = body;
 
-  if (!id || !full_name || !passport_id || !driving_license) {
+  if (!id || !full_name) {
     return NextResponse.json({ error: 'Missing fields' }, { status: 400 });
   }
 

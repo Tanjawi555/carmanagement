@@ -143,7 +143,7 @@ export default function ClientsPage() {
 
   const openEditModal = (client: Client) => {
     setEditingClient(client);
-    setFormData({ full_name: client.full_name, passport_id: client.passport_id, driving_license: client.driving_license });
+    setFormData({ full_name: client.full_name, passport_id: client.passport_id || '', driving_license: client.driving_license || '' });
     setShowModal(true);
   };
 
@@ -186,8 +186,6 @@ export default function ClientsPage() {
                     <tr>
                       <th>#</th>
                       <th>{t.full_name}</th>
-                      <th>{t.passport_id}</th>
-                      <th>{t.driving_license}</th>
                       <th>{t.passport_image}</th>
                       <th>{t.license_image}</th>
                       <th>{t.actions}</th>
@@ -198,8 +196,6 @@ export default function ClientsPage() {
                       <tr key={client._id}>
                         <td>{index + 1}</td>
                         <td>{client.full_name}</td>
-                        <td><code>{client.passport_id}</code></td>
-                        <td><code>{client.driving_license}</code></td>
                         <td>
                           {client.passport_image ? (
                             <a href={`/uploads/documents/${client.passport_image}`} target="_blank" className="btn btn-sm btn-outline-primary">
@@ -249,20 +245,10 @@ export default function ClientsPage() {
                     <button type="button" className="btn-close" onClick={() => setShowModal(false)} />
                   </div>
                   <div className="modal-body">
-                    <div className="row">
-                      <div className="col-md-6 mb-3">
+                      <div className="mb-3">
                         <label className="form-label">{t.full_name}</label>
                         <input type="text" className="form-control" value={formData.full_name} onChange={(e) => setFormData({ ...formData, full_name: e.target.value })} required />
                       </div>
-                      <div className="col-md-6 mb-3">
-                        <label className="form-label">{t.passport_id}</label>
-                        <input type="text" className="form-control" value={formData.passport_id} onChange={(e) => setFormData({ ...formData, passport_id: e.target.value })} required />
-                      </div>
-                    </div>
-                    <div className="mb-3">
-                      <label className="form-label">{t.driving_license}</label>
-                      <input type="text" className="form-control" value={formData.driving_license} onChange={(e) => setFormData({ ...formData, driving_license: e.target.value })} required />
-                    </div>
                     {!editingClient && (
                       <div className="row">
                         <div className="col-md-6 mb-3">

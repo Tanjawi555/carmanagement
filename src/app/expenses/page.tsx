@@ -127,7 +127,14 @@ export default function ExpensesPage() {
     switch (category) {
       case 'maintenance': return t.maintenance;
       case 'insurance': return t.insurance;
-      case 'fuel': return t.fuel;
+      case 'local': return t.cat_local;
+      case 'wifi': return t.cat_wifi;
+      case 'orange_network': return t.cat_orange;
+      case 'oil_change': return t.cat_oil;
+      case 'timing_belt': return t.cat_belt;
+      case 'tires': return t.cat_tires;
+      case 'tax': return t.cat_tax;
+      case 'fuel': return t.fuel; // Keep for backward compatibility mostly
       default: return t.other;
     }
   };
@@ -137,6 +144,13 @@ export default function ExpensesPage() {
       case 'maintenance': return 'bg-primary';
       case 'insurance': return 'bg-info';
       case 'fuel': return 'bg-warning text-dark';
+      case 'local': return 'bg-primary bg-opacity-75';
+      case 'wifi': return 'bg-info text-dark';
+      case 'orange_network': return 'bg-warning text-dark';
+      case 'oil_change': return 'bg-secondary';
+      case 'timing_belt': return 'bg-danger';
+      case 'tires': return 'bg-dark';
+      case 'tax': return 'bg-danger';
       default: return 'bg-secondary';
     }
   };
@@ -237,7 +251,13 @@ export default function ExpensesPage() {
                       <select className="form-select" value={formData.category} onChange={(e) => setFormData({ ...formData, category: e.target.value })} required>
                         <option value="maintenance">{t.maintenance}</option>
                         <option value="insurance">{t.insurance}</option>
-                        <option value="fuel">{t.fuel}</option>
+                        <option value="local">{t.cat_local}</option>
+                        <option value="wifi">{t.cat_wifi}</option>
+                        <option value="orange_network">{t.cat_orange}</option>
+                        <option value="oil_change">{t.cat_oil}</option>
+                        <option value="timing_belt">{t.cat_belt}</option>
+                        <option value="tires">{t.cat_tires}</option>
+                        <option value="tax">{t.cat_tax}</option>
                         <option value="other">{t.other}</option>
                       </select>
                     </div>
