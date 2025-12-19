@@ -69,9 +69,34 @@ export async function DELETE(request: NextRequest) {
   }
 
   try {
+    const client = await ClientModel.getById(id);
+    
+    if (client) {
+      const { unlink } = await import('fs/promises');
+      const path = await import('path');
+      const UPLOAD_DIR = path.join(process.cwd(), 'public', 'uploads', 'documents');
+
+      if (client.passport_image) {
+        try {
+          await unlink(path.join(UPLOAD_DIR, client.passport_image));
+        } catch (error) {
+          console.error(`Failed to delete passport image: ${client.passport_image}`, error);
+        }
+      }
+
+      if (client.license_image) {
+        try {
+          await unlink(path.join(UPLOAD_DIR, client.license_image));
+        } catch (error) {
+          console.error(`Failed to delete license image: ${client.license_image}`, error);
+        }
+      }
+    }
+
     await ClientModel.delete(id);
     return NextResponse.json({ success: true });
   } catch (error) {
+    console.error('Delete client error:', error);
     return NextResponse.json({ error: 'Failed to delete client' }, { status: 500 });
   }
 }
