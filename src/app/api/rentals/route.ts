@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
   }
 
   const body = await request.json();
-  const { car_id, client_id, start_date, return_date, rental_price } = body;
+  const { car_id, client_id, start_date, return_date, rental_price, status } = body;
 
   if (!car_id || !client_id || !start_date || !return_date) {
     return NextResponse.json({ error: 'Missing fields' }, { status: 400 });
@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
     if (hasOverlap) {
         return NextResponse.json({ error: 'This car is already reserved for the selected time.' }, { status: 409 });
     }
-    await RentalModel.create(car_id, client_id, start_date, return_date, parseFloat(rental_price) || 0);
+    await RentalModel.create(car_id, client_id, start_date, return_date, parseFloat(rental_price) || 0, status || 'reserved');
     return NextResponse.json({ success: true });
   } catch (error) {
     return NextResponse.json({ error: 'Failed to create rental' }, { status: 500 });

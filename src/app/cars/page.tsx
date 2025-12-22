@@ -36,6 +36,7 @@ export default function CarsPage() {
 
   // Reservation Modal State
   const [showReservationModal, setShowReservationModal] = useState(false);
+  const [modalMode, setModalMode] = useState<'reserve' | 'rent'>('reserve');
   const [clients, setClients] = useState<Client[]>([]);
   const [reservationData, setReservationData] = useState({
     car_id: '',
@@ -175,7 +176,8 @@ export default function CarsPage() {
     }
   };
 
-  const openReservationModal = (car: Car) => {
+  const openReservationModal = (car: Car, mode: 'reserve' | 'rent' = 'reserve') => {
+    setModalMode(mode);
     setReservationData({
         car_id: car._id,
         client_id: '',
@@ -194,19 +196,19 @@ export default function CarsPage() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 ...reservationData,
-                status: 'reserved'
+                status: modalMode === 'rent' ? 'rented' : 'reserved'
             })
         });
 
         if(res.ok) {
-            showMessage_('success', t.success || 'Reserved successfully');
+            showMessage_('success', t.success || 'Saved successfully');
             setShowReservationModal(false);
             fetchCars();
         } else {
-            showMessage_('danger', t.error || 'Failed to reserve');
+            showMessage_('danger', t.error || 'Failed to save');
         }
     } catch (error) {
-        showMessage_('danger', t.error || 'Failed to reserve');
+        showMessage_('danger', t.error || 'Failed to save');
     }
   };
 
@@ -382,19 +384,19 @@ export default function CarsPage() {
                           )}
                         </td>
                         <td className="text-end pe-4">
-                          <div className="btn-group gap-2"> {/* Added gap for spacing */}
+                          <div className="btn-group gap-2"> 
                             {/* Action Buttons styled like Image 2 */}
-                            {car.status !== 'reserved' && (
-                                <button onClick={() => openReservationModal(car)} className="btn btn-sm btn-light text-warning rounded-circle d-flex align-items-center justify-content-center" style={{width: '32px', height: '32px'}} title={t.reserved}>
+                             {car.status !== 'reserved' && car.status !== 'rented' && (
+                                <button onClick={() => openReservationModal(car, 'reserve')} className="btn btn-sm btn-light text-warning rounded-circle d-flex align-items-center justify-content-center" style={{width: '32px', height: '32px'}} title={t.reserved}>
                                     <i className="bi bi-clock-fill fs-6"></i>
                                 </button>
                             )}
                             {car.status !== 'rented' && (
-                                <button onClick={() => handleStatusChange(car._id, 'rented')} className="btn btn-sm btn-light text-info rounded-circle d-flex align-items-center justify-content-center" style={{width: '32px', height: '32px'}} title={t.rented}>
+                                <button onClick={() => openReservationModal(car, 'rent')} className="btn btn-sm btn-light text-info rounded-circle d-flex align-items-center justify-content-center" style={{width: '32px', height: '32px'}} title={t.rented}>
                                     <i className="bi bi-key-fill fs-6"></i>
                                 </button>
                             )}
-                            {car.status !== 'available' && (
+                            {car.status !== 'available' && car.status === 'rented' && (
                                 <button onClick={() => handleStatusChange(car._id, 'available')} className="btn btn-sm btn-light text-success rounded-circle d-flex align-items-center justify-content-center" style={{width: '32px', height: '32px'}} title={t.available}>
                                     <i className="bi bi-check-lg fs-6"></i>
                                 </button>
@@ -480,7 +482,7 @@ export default function CarsPage() {
                     <div className="modal-content">
                         <form onSubmit={handleReservationSubmit}>
                             <div className="modal-header">
-                                <h5 className="modal-title">{t.reserved || 'Reserve Car'}</h5>
+                                <h5 className="modal-title">{modalMode === 'rent' ? (t.rented || 'Rent Car') : (t.reserved || 'Reserve Car')}</h5>
                                 <button type="button" className="btn-close" onClick={() => setShowReservationModal(false)} />
                             </div>
                             <div className="modal-body">

@@ -550,7 +550,8 @@ export const RentalModel = {
     client_id: string,
     start_date: string,
     return_date: string,
-    rental_price: number
+    rental_price: number,
+    status: 'reserved' | 'rented' = 'reserved'
   ) {
     const db = await getDatabase();
     const result = await db.collection('rentals').insertOne({
@@ -559,12 +560,13 @@ export const RentalModel = {
       start_date,
       return_date,
       rental_price,
-      status: 'reserved',
+      status, // Use the passed status
       created_at: new Date(),
     });
+    // Update car status to match the rental status
     await db.collection('cars').updateOne(
       { _id: new ObjectId(car_id) },
-      { $set: { status: 'reserved' } }
+      { $set: { status } }
     );
     return result;
   },
