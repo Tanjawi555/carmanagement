@@ -596,10 +596,23 @@ export const RentalModel = {
       created_at: new Date(),
     });
     
-    await db.collection('cars').updateOne(
-      { _id: new ObjectId(car_id) },
-      { $set: { status } }
-    );
+    // Intelligent Status Update:
+    // If the new rental is 'rented', we definitely mark the car as 'rented'.
+    // If the new rental is 'reserved', we only mark the car as 'reserved' if it is NOT currently 'rented'.
+    // This allows future reservations without "un-renting" the car visually.
+    
+    if (status === 'rented') {
+        await db.collection('cars').updateOne(
+          { _id: new ObjectId(car_id) },
+          { $set: { status: 'rented' } }
+        );
+    } else {
+        // Status is 'reserved'
+         await db.collection('cars').updateOne(
+          { _id: new ObjectId(car_id), status: { $ne: 'rented' } },
+          { $set: { status: 'reserved' } }
+        );
+    }
     return result;
   },
 

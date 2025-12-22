@@ -202,12 +202,13 @@ export default function CarsPage() {
             })
         });
 
+        const data = await res.json();
         if(res.ok) {
             showMessage_('success', t.success || 'Saved successfully');
             setShowReservationModal(false);
             fetchCars();
         } else {
-            showMessage_('danger', t.error || 'Failed to save');
+            showMessage_('danger', data.error || t.error || 'Failed to save');
         }
     } catch (error) {
         showMessage_('danger', t.error || 'Failed to save');
@@ -379,16 +380,13 @@ export default function CarsPage() {
                         <td className="text-end pe-4">
                           <div className="btn-group gap-2"> 
                             {/* Action Buttons styled like Image 2 */}
-                             {car.status !== 'reserved' && car.status !== 'rented' && (
-                                <button onClick={() => openReservationModal(car, 'reserve')} className="btn btn-sm btn-light text-warning rounded-circle d-flex align-items-center justify-content-center" style={{width: '32px', height: '32px'}} title={t.reserved}>
-                                    <i className="bi bi-clock-fill fs-6"></i>
-                                </button>
-                            )}
-                            {car.status !== 'rented' && (
-                                <button onClick={() => openReservationModal(car, 'rent')} className="btn btn-sm btn-light text-info rounded-circle d-flex align-items-center justify-content-center" style={{width: '32px', height: '32px'}} title={t.rented}>
-                                    <i className="bi bi-key-fill fs-6"></i>
-                                </button>
-                            )}
+                                 <button onClick={() => openReservationModal(car, 'reserve')} className="btn btn-sm btn-light text-warning rounded-circle d-flex align-items-center justify-content-center" style={{width: '32px', height: '32px'}} title={t.reserved}>
+                                     <i className="bi bi-clock-fill fs-6"></i>
+                                 </button>
+
+                                 <button onClick={() => openReservationModal(car, 'rent')} className="btn btn-sm btn-light text-info rounded-circle d-flex align-items-center justify-content-center" style={{width: '32px', height: '32px'}} title={t.rented}>
+                                     <i className="bi bi-key-fill fs-6"></i>
+                                 </button>
                             {car.status !== 'available' && car.status === 'rented' && (
                                 <button onClick={() => handleStatusChange(car._id, 'available')} className="btn btn-sm btn-light text-success rounded-circle d-flex align-items-center justify-content-center" style={{width: '32px', height: '32px'}} title={t.available}>
                                     <i className="bi bi-check-lg fs-6"></i>

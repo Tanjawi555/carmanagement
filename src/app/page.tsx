@@ -5,6 +5,7 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import AppLayout from '@/components/AppLayout';
 import { getTranslations, isRTL, Language, Translations } from '@/lib/translations';
+import { toBusinessInputString } from '@/lib/timezone';
 
 interface Notification {
   type: string;
@@ -39,6 +40,13 @@ export default function DashboardPage() {
   const [t, setT] = useState<Translations>(getTranslations('ar'));
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
+  
+  // Date Filter (YYYY-MM)
+  const [filterDate, setFilterDate] = useState(() => {
+     // Default to current business month
+     const nowStr = toBusinessInputString(new Date());
+     return nowStr ? nowStr.slice(0, 7) : new Date().toISOString().slice(0, 7);
+  });
 
   useEffect(() => {
     const savedLang = localStorage.getItem('lang') as Language;
@@ -63,11 +71,12 @@ export default function DashboardPage() {
     if (session) {
       fetchData();
     }
-  }, [session]);
+  }, [session, filterDate]);
 
   const fetchData = async () => {
     try {
-      const res = await fetch('/api/dashboard');
+      const [year, month] = filterDate.split('-');
+      const res = await fetch(`/api/dashboard?month=${month}&year=${year}`);
       if (res.ok) {
         const result = await res.json();
         setData(result);
@@ -128,8 +137,8 @@ export default function DashboardPage() {
       username={data?.username || session.user?.name || undefined}
     >
       <div className="container-fluid py-4">
-        {/* Welcome Section */}
-        <div className="d-flex justify-content-between align-items-center mb-5 animate-fade-in-up">
+        {/* Welcome Section & Filter */}
+        <div className="d-flex justify-content-between align-items-center mb-5 animate-fade-in-up flex-wrap gap-3">
           <div>
             <h2 className="fw-bold mb-1">
               {t.dashboard}
@@ -138,16 +147,33 @@ export default function DashboardPage() {
               {t.welcome}, <span className="text-primary fw-bold">{data?.username || session.user?.name}</span>
             </p>
           </div>
-          <div className="d-none d-md-block">
-            <span className="badge bg-white text-dark shadow-sm py-2 px-3">
-              <i className="bi bi-calendar-check me-2 text-primary"></i>
-              {new Date().toLocaleDateString(lang === 'ar' ? 'ar-EG' : lang === 'fr' ? 'fr-FR' : 'en-US', {
-                weekday: 'long',
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-              })}
-            </span>
+          
+          <div className="d-flex align-items-center gap-3">
+             {/* Month Filter */}
+            <div className="card border-0 shadow-sm" style={{borderRadius: '1rem'}}>
+                <div className="card-body p-2 d-flex align-items-center">
+                    <span className="ps-3 text-muted me-2"><i className="bi bi-calendar-month"></i></span>
+                    <input 
+                        type="month" 
+                        className="form-control border-0 shadow-none bg-transparent"
+                        value={filterDate}
+                        onChange={(e) => setFilterDate(e.target.value)}
+                        style={{ cursor: 'pointer' }}
+                    />
+                </div>
+            </div>
+
+            <div className="d-none d-md-block">
+                <span className="badge bg-white text-dark shadow-sm py-2 px-3">
+                <i className="bi bi-calendar-check me-2 text-primary"></i>
+                {new Date().toLocaleDateString(lang === 'ar' ? 'ar-EG' : lang === 'fr' ? 'fr-FR' : 'en-US', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                })}
+                </span>
+            </div>
           </div>
         </div>
 

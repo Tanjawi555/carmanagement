@@ -5,6 +5,7 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import AppLayout from '@/components/AppLayout';
 import { getTranslations, isRTL, Language, Translations } from '@/lib/translations';
+import { toBusinessInputString, formatInBusinessTime } from '@/lib/timezone';
 
 interface Rental {
   _id: string;
@@ -33,7 +34,10 @@ export default function ProfitsPage() {
   const [loading, setLoading] = useState(true);
   
   // Date Filter
-  const [filterDate, setFilterDate] = useState(new Date().toISOString().slice(0, 7)); // YYYY-MM
+  const [filterDate, setFilterDate] = useState(() => {
+     const nowStr = toBusinessInputString(new Date());
+     return nowStr ? nowStr.slice(0, 7) : new Date().toISOString().slice(0, 7);
+  });
 
   useEffect(() => {
     const savedLang = localStorage.getItem('lang') as Language;
@@ -214,12 +218,12 @@ export default function ProfitsPage() {
                                 </div>
                                 <div>
                                     <div className="fw-medium text-dark">{rental.client_name}</div>
-                                    <div className="d-md-none small text-muted"> {rental.start_date} </div>
+                                    <div className="d-md-none small text-muted"> {formatInBusinessTime(rental.start_date)} </div>
                                 </div>
                             </div>
                         </td>
-                        <td className="d-none d-md-table-cell text-muted">{rental.start_date}</td>
-                        <td className="d-none d-md-table-cell text-muted">{rental.return_date}</td>
+                        <td className="d-none d-md-table-cell text-muted">{formatInBusinessTime(rental.start_date)}</td>
+                        <td className="d-none d-md-table-cell text-muted">{formatInBusinessTime(rental.return_date)}</td>
                         <td className="fw-bold text-success">
                           +{rental.rental_price.toFixed(2)} DH
                         </td>
