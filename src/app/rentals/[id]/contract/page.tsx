@@ -1,10 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter, useParams } from 'next/navigation';
 import { getTranslations, isRTL, Language, Translations } from '@/lib/translations';
 import { toBusinessInputString } from '@/lib/timezone';
+import SignatureCanvas from 'react-signature-canvas';
 
 export default function ContractPage() {
   const { data: session, status } = useSession();
@@ -13,6 +14,27 @@ export default function ContractPage() {
   const id = params.id as string;
 
   const [loading, setLoading] = useState(true);
+
+  // Signature State
+  const [signatures, setSignatures] = useState<{client: string | null, client2: string | null, agency: string | null}>({
+      client: null, client2: null, agency: null
+  });
+  const [activeSignField, setActiveSignField] = useState<'client' | 'client2' | 'agency' | null>(null);
+  const sigCanvas = useRef<any>(null);
+
+  const handleSaveSignature = () => {
+      if (sigCanvas.current && activeSignField) {
+          const dataURL = sigCanvas.current.getCanvas().toDataURL('image/png');
+          setSignatures(prev => ({...prev, [activeSignField]: dataURL}));
+          setActiveSignField(null);
+      }
+  };
+
+  const clearSignature = () => {
+      if (sigCanvas.current) {
+          sigCanvas.current.clear();
+      }
+  };
   
   // Editable fields state
   const [contractData, setContractData] = useState({
@@ -174,30 +196,22 @@ export default function ContractPage() {
                    <p className="text-[10px] font-bold leading-tight m-0">GSM : 06 63 20 33 66 - 06 88 63 00 06</p>
                </div>
 
-               {/* Center: Logo */}
-               <div className="w-[20%] flex justify-center items-center">
-                   <div className="relative transform scale-125">
-                       <svg width="100" height="50" viewBox="0 0 140 60" className="overflow-visible">
-                           {/* Hexagon Shape */}
-                           <path d="M35,2 L105,2 L125,30 L105,58 L35,58 L15,30 Z" 
-                                 fill="none" stroke="#555555" strokeWidth="3" strokeLinejoin="round" />
-                           {/* Car & Text */}
-                           <path d="M45,22 C45,22 55,10 70,10 C85,10 95,22 95,22 L100,22 L100,28 L40,28 L40,22 Z" fill="#555555" />
-                           <path d="M42,28 L98,28 L98,33 L42,33 Z" fill="#555555" />
-                           <circle cx="50" cy="33" r="3" fill="white" stroke="#555555" strokeWidth="1"/>
-                           <circle cx="90" cy="33" r="3" fill="white" stroke="#555555" strokeWidth="1"/>
-                           <text x="70" y="50" textAnchor="middle" 
-                                 fontFamily="'Segoe UI', 'Brush Script MT', cursive" 
-                                 fontSize="22" fontWeight="900" fontStyle="italic" fill="#555555"
-                                 style={{textShadow: '2px 2px 0px white'}}
-                           >Narenos</text>
-                       </svg>
-                   </div>
-               </div>
+                {/* Center: Logo */}
+                <div className="w-[20%] flex justify-center items-center">
+                    <div className="relative w-32 h-32">
+                        {/* Using CSS filter to make the black-bg logo printer friendly (Black text on White) */}
+                         <img 
+                            src="/narenos-logo.jpg" 
+                            alt="Narenos Logo" 
+                            className="w-full h-full object-contain"
+                            style={{ filter: 'grayscale(100%) invert(100%) contrast(150%)' }} 
+                         />
+                    </div>
+                </div>
 
                {/* Right: Arabic Info */}
                <div className="text-center w-[40%]" dir="rtl">
-                   <h1 className="text-2xl font-black uppercase tracking-tight  leading-none text-[#555555] m-0" style={{fontFamily: 'serif'}}>كراء السيارات ترينوس</h1>
+                   <h1 className="text-2xl font-black uppercase tracking-tight  leading-none text-[#555555] m-0" style={{fontFamily: 'serif'}}>كراء السيارات نرينوس</h1>
                    <p className="text-[11px] font-bold leading-none m-0">حي القصيبات زنقة 1 رقم 13 - طنجة</p>
                    <p className="text-[11px] font-bold leading-none m-0" dir="ltr">0688630006 - 0663203366 : الهاتف</p>
                </div>
@@ -521,11 +535,11 @@ export default function ContractPage() {
                    </div>
                </div>
 
-               {/* Row 3: Legal & Signatures */}
+               {/* Signatures Row */}
                <div className="mt-1 relative">
                    
                    {/* Top Text Row */}
-                   <div className="flex items-start mb-8">
+                   <div className="flex items-start mb-4">
                        <div className="text-[9px] leading-[1.1] text-justify w-[35%] tracking-tighter">
                            Je reconnais avoir pris connaissance des présentes<br/>
                            conditions générales (recto et verso)<br/>
@@ -539,23 +553,86 @@ export default function ContractPage() {
                    </div>
 
                    {/* Signatures Row */}
-                   <div className="flex items-end justify-between px-2">
-                       <div className="font-black text-sm text-[#4a4a4a]">Signature Client</div>
-                       
-                       <div className="font-black text-sm text-[#4a4a4a]">Signature Client</div>
-
-                       <div className="font-bold text-[11px] italic pb-1">
-                           Fait à Tanger le : _________________
+                   <div className="grid grid-cols-3 gap-4 items-end px-2">
+                       {/* Client 1 */}
+                       <div className="flex flex-col items-center">
+                           <div className="font-black text-sm text-[#4a4a4a] mb-2">Signature Client</div>
+                           <div 
+                                className="w-full h-24 border border-[#ccc] rounded cursor-pointer relative flex items-center justify-center hover:bg-gray-50 bg-white"
+                                onClick={() => setActiveSignField('client')}
+                           >
+                                {signatures.client ? (
+                                    <img src={signatures.client} alt="Signed" className="max-h-full max-w-full object-contain" />
+                                ) : (
+                                    <span className="text-[10px] text-gray-400 print:hidden">Click to Sign</span>
+                                )} 
+                           </div>
                        </div>
                        
-                       <div className="font-black text-xl tracking-widest text-[#4a4a4a]">
-                           NARENOS
+                       {/* Client 2 */}
+                       <div className="flex flex-col items-center">
+                           <div className="font-black text-sm text-[#4a4a4a] mb-2">Signature Client</div>
+                           <div 
+                                className="w-full h-24 border border-[#ccc] rounded cursor-pointer relative flex items-center justify-center hover:bg-gray-50 bg-white"
+                                onClick={() => setActiveSignField('client2')}
+                           >
+                                {signatures.client2 ? (
+                                    <img src={signatures.client2} alt="Signed" className="max-h-full max-w-full object-contain" />
+                                ) : (
+                                    <span className="text-[10px] text-gray-400 print:hidden">Click to Sign</span>
+                                )}
+                           </div>
+                       </div>
+
+                       {/* Agency */}
+                       <div className="flex flex-col items-end">
+                           <div className="font-bold text-[11px] italic mb-1 text-right w-full">
+                               Fait à Tanger le : _________________
+                           </div>
+                           
+                           <div className="font-black text-xl tracking-widest text-[#4a4a4a] mb-1 text-right w-full">
+                               NARENOS
+                           </div>
+                           <div 
+                                className="w-full h-20 border border-[#ccc] rounded cursor-pointer relative flex items-center justify-center hover:bg-gray-50 bg-white"
+                                onClick={() => setActiveSignField('agency')}
+                           >
+                                {signatures.agency ? (
+                                    <img src={signatures.agency} alt="Signed" className="max-h-full max-w-full object-contain" />
+                                ) : (
+                                    <span className="text-[10px] text-gray-400 print:hidden">Click to Sign</span>
+                                )}
+                           </div>
                        </div>
                    </div>
                </div>
 
           </div>
       </div>
+      {/* Signature Modal */}
+      {activeSignField && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black bg-opacity-50 select-none print:hidden">
+            <div className="bg-white p-4 rounded-xl shadow-2xl w-[90%] max-w-md animate-fade-in-up">
+                <h3 className="text-lg font-bold mb-3 text-center">
+                    Sign Here ({activeSignField === 'client' ? 'Client' : activeSignField === 'client2' ? 'Client 2' : 'Agency'})
+                </h3>
+                <div className="border-2 border-dashed border-gray-300 rounded mb-4 h-48 bg-gray-50 overflow-hidden">
+                    <SignatureCanvas 
+                        ref={sigCanvas} 
+                        penColor="black"
+                        backgroundColor="rgba(0,0,0,0)"
+                        canvasProps={{className: 'w-full h-full'}} 
+                    />
+                </div>
+                <div className="flex justify-between gap-2">
+                    <button onClick={() => setActiveSignField(null)} className="btn btn-secondary flex-1">Cancel</button>
+                    <button onClick={clearSignature} className="btn btn-warning flex-1">Clear</button>
+                    <button onClick={handleSaveSignature} className="btn btn-primary flex-1">Save</button>
+                </div>
+            </div>
+        </div>
+      )}
+
     </div>
   );
 }

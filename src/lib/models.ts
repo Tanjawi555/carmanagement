@@ -389,7 +389,7 @@ export const RentalModel = {
           client_name: '$client.full_name',
         },
       },
-      { $sort: { created_at: -1 } },
+      { $sort: { start_date: -1 } },
     ]).toArray();
     return rentals;
   },
@@ -514,7 +514,7 @@ export const RentalModel = {
         $facet: {
           metadata: [{ $count: "total" }],
           data: [
-            { $sort: { created_at: -1 } },
+            { $sort: { start_date: -1 } },
             { $skip: skip },
             { $limit: limit }
           ]
@@ -543,11 +543,7 @@ export const RentalModel = {
   async checkOverlap(car_id: string, start_date: string, return_date: string, exclude_rental_id?: string) {
     const db = await getDatabase();
     
-    // Convert inputs to UTC ISO if they are not already (assuming inputs are coming from UI in Business Time)
-    // NOTE: This assumes caller passes Business Time strings. 
-    // If create() calls this, it should pass UTC or we handle it here. 
-    // Best practice: The caller (create/update) normalizes data to UTC FIRST, then calls this.
-    // Normalize dates to UTC for comparison with DB
+  
     const startUTC = toUTCISO(start_date);
     const endUTC = toUTCISO(return_date);
     
@@ -596,10 +592,7 @@ export const RentalModel = {
       created_at: new Date(),
     });
     
-    // Intelligent Status Update:
-    // If the new rental is 'rented', we definitely mark the car as 'rented'.
-    // If the new rental is 'reserved', we only mark the car as 'reserved' if it is NOT currently 'rented'.
-    // This allows future reservations without "un-renting" the car visually.
+    
     
     if (status === 'rented') {
         await db.collection('cars').updateOne(
@@ -738,13 +731,7 @@ export const RentalModel = {
         }
 
         if (r.status === 'rented') {
-            // Check return today
-            // Note: Reuse isStartingToday logic but for return date
-            // Note 2: Use helper strictly for "Is Today in Business Time"
-            // Re-importing logic or using isSameDayBusiness idea
-            
-            // Check if return date falls on "Today" in Business Time
-            // Reuse isStartingToday logic as it just checks "Is DATE on Today"
+          
             if (isStartingToday(r.return_date)) { 
                 notifications.push({
                     type: 'return_today',
