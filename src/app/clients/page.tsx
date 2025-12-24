@@ -15,6 +15,9 @@ interface Client {
   passport_id?: string;
   driving_license?: string;
   id_number?: string;
+  date_of_birth?: string;
+  license_expiry_date?: string;
+  passport_expiry_date?: string;
 }
 
 export default function ClientsPage() {
@@ -31,7 +34,10 @@ export default function ClientsPage() {
     address: '', 
     passport_id: '', 
     driving_license: '', 
-    id_number: '' 
+    id_number: '',
+    date_of_birth: '',
+    license_expiry_date: '',
+    passport_expiry_date: '' 
   });
   const [passportFrontFile, setPassportFrontFile] = useState<File | null>(null);
   const [passportBackFile, setPassportBackFile] = useState<File | null>(null);
@@ -191,7 +197,9 @@ export default function ClientsPage() {
       showMessage_('success', t.success);
       setShowModal(false);
       setEditingClient(null);
-      setFormData({ full_name: '', address: '', passport_id: '', driving_license: '', id_number: '' });
+      setEditingClient(null);
+      setFormData({ full_name: '', address: '', passport_id: '', driving_license: '', id_number: '', date_of_birth: '', license_expiry_date: '', passport_expiry_date: '' });
+      setPassportFrontFile(null);
       setPassportFrontFile(null);
       setPassportBackFile(null);
       setLicenseFrontFile(null);
@@ -222,7 +230,10 @@ export default function ClientsPage() {
       address: client.address || '',
       passport_id: client.passport_id || '',
       driving_license: client.driving_license || '',
-      id_number: client.id_number || ''
+      id_number: client.id_number || '',
+      date_of_birth: client.date_of_birth || '',
+      license_expiry_date: client.license_expiry_date || '',
+      passport_expiry_date: client.passport_expiry_date || ''
     });
     setShowModal(true);
     setPassportFrontFile(null);
@@ -312,6 +323,10 @@ export default function ClientsPage() {
 
                     <div className="mb-3 small text-muted">
                         <div className="d-flex justify-content-between border-bottom pb-2 mb-2">
+                             <span>{t.date_of_birth || "Date of Birth"}:</span>
+                             <span className="fw-medium text-dark">{client.date_of_birth || '-'}</span>
+                        </div>
+                        <div className="d-flex justify-content-between border-bottom pb-2 mb-2">
                             <span>{t.id_number}:</span>
                             <span className="fw-medium text-dark">{client.id_number || '-'}</span>
                         </div>
@@ -379,6 +394,7 @@ export default function ClientsPage() {
                       <th className="border-0 py-3 text-secondary text-uppercase small bg-transparent">{t.full_name}</th>
                       <th className="border-0 py-3 text-secondary text-uppercase small bg-transparent d-none d-lg-table-cell">{t.address}</th>
                       <th className="border-0 py-3 text-secondary text-uppercase small bg-transparent d-none d-xl-table-cell">{t.id_number}</th>
+                      <th className="border-0 py-3 text-secondary text-uppercase small bg-transparent d-none d-lg-table-cell">{t.date_of_birth || 'Birth Date'}</th>
                       <th className="border-0 py-3 text-secondary text-uppercase small bg-transparent d-none d-xl-table-cell">{t.passport_number}</th>
                       <th className="border-0 py-3 text-secondary text-uppercase small bg-transparent d-none d-xl-table-cell">{t.license_number}</th>
                       <th className="border-0 py-3 text-secondary text-uppercase small bg-transparent">{t.passport_image}</th>
@@ -400,6 +416,7 @@ export default function ClientsPage() {
                         </td>
                         <td className="d-none d-lg-table-cell text-muted small">{client.address || '-'}</td>
                         <td className="d-none d-xl-table-cell text-muted small font-monospace">{client.id_number || '-'}</td>
+                        <td className="d-none d-lg-table-cell text-muted small">{client.date_of_birth || '-'}</td>
                         <td className="d-none d-xl-table-cell text-muted small font-monospace">{client.passport_id || '-'}</td>
                         <td className="d-none d-xl-table-cell text-muted small font-monospace">{client.driving_license || '-'}</td>
                         <td>
@@ -520,6 +537,11 @@ export default function ClientsPage() {
                         <input type="text" className="form-control" value={formData.address} onChange={(e) => setFormData({ ...formData, address: e.target.value })} placeholder="Complete Address" />
                       </div>
 
+                      <div className="mb-3">
+                         <label className="form-label">{t.date_of_birth || "Date of Birth"}</label>
+                         <input type="date" className="form-control" value={formData.date_of_birth} onChange={(e) => setFormData({ ...formData, date_of_birth: e.target.value })} />
+                      </div>
+
                       <div className="row">
                         <div className="col-md-4 mb-3">
                           <label className="form-label">{t.id_number || "ID Number"}</label>
@@ -532,6 +554,14 @@ export default function ClientsPage() {
                         <div className="col-md-4 mb-3">
                            <label className="form-label">{t.license_number || "Driver's License (DL N)"}</label>
                            <input type="text" className="form-control" value={formData.driving_license} onChange={(e) => setFormData({ ...formData, driving_license: e.target.value })} placeholder="License Number" />
+                        </div>
+                        <div className="col-md-4 mb-3">
+                           <label className="form-label">{t.license_expiry || "License Expiry Date"}</label>
+                           <input type="date" className="form-control" value={formData.license_expiry_date} onChange={(e) => setFormData({ ...formData, license_expiry_date: e.target.value })} />
+                        </div>
+                        <div className="col-md-4 mb-3">
+                           <label className="form-label">{t.passport_expiry || "Passport Expiry Date"}</label>
+                           <input type="date" className="form-control" value={formData.passport_expiry_date} onChange={(e) => setFormData({ ...formData, passport_expiry_date: e.target.value })} />
                         </div>
                       </div>
                     
@@ -593,7 +623,7 @@ export default function ClientsPage() {
         <button 
           className="btn btn-primary rounded-circle shadow-lg d-flex align-items-center justify-content-center position-fixed animate-fade-in-up" 
           style={{ width: '60px', height: '60px', bottom: '90px', right: '20px', zIndex: 1050 }}
-          onClick={() => { setEditingClient(null); setFormData({ full_name: '', address: '', passport_id: '', driving_license: '', id_number: '' }); setShowModal(true); setPassportFrontFile(null); setPassportBackFile(null); setLicenseFrontFile(null); setLicenseBackFile(null); }}
+           onClick={() => { setEditingClient(null); setFormData({ full_name: '', address: '', passport_id: '', driving_license: '', id_number: '', date_of_birth: '', license_expiry_date: '', passport_expiry_date: '' }); setShowModal(true); setPassportFrontFile(null); setPassportBackFile(null); setLicenseFrontFile(null); setLicenseBackFile(null); }}
         >
            <i className="bi bi-plus-lg fs-2"></i>
         </button>

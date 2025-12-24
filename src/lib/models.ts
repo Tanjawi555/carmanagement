@@ -1,5 +1,6 @@
 import { ObjectId } from 'mongodb';
 import { getDatabase } from './mongodb';
+import { BackupService } from './backup';
 
 export interface Car {
   _id?: ObjectId;
@@ -20,6 +21,9 @@ export interface Client {
   driving_license?: string;
   address?: string;
   id_number?: string;
+  date_of_birth?: string;
+  license_expiry_date?: string;
+  passport_expiry_date?: string;
   passport_image?: string | null;
   license_image?: string | null;
   created_at: Date;
@@ -287,19 +291,34 @@ export const ClientModel = {
     passport_image?: string | null,
     license_image?: string | null,
     address?: string,
-    id_number?: string
+    id_number?: string,
+    date_of_birth?: string,
+    license_expiry_date?: string,
+    passport_expiry_date?: string
   ) {
     const db = await getDatabase();
-    return db.collection<Client>('clients').insertOne({
+    const doc = {
       full_name,
       passport_id: passport_id || '',
       driving_license: driving_license || '',
       address: address || '',
       id_number: id_number || '',
+      date_of_birth: date_of_birth || '',
+      license_expiry_date: license_expiry_date || '',
+      passport_expiry_date: passport_expiry_date || '',
       passport_image: passport_image || null,
       license_image: license_image || null,
       created_at: new Date(),
-    });
+    };
+    const result = await db.collection<Client>('clients').insertOne(doc);
+
+    // Backup
+    try {
+        const newClient = { ...doc, _id: result.insertedId };
+        await BackupService.saveClient(newClient);
+    } catch (e) { console.error('Backup failed', e); }
+
+    return result;
   },
 
   async update(
@@ -310,7 +329,10 @@ export const ClientModel = {
     passport_image?: string | null,
     license_image?: string | null,
     address?: string,
-    id_number?: string
+    id_number?: string,
+    date_of_birth?: string,
+    license_expiry_date?: string,
+    passport_expiry_date?: string
   ) {
     const db = await getDatabase();
     const updateData: any = { 
@@ -318,15 +340,26 @@ export const ClientModel = {
         passport_id: passport_id || '', 
         driving_license: driving_license || '',
         address: address || '',
-        id_number: id_number || ''
+        id_number: id_number || '',
+        date_of_birth: date_of_birth || '',
+        license_expiry_date: license_expiry_date || '',
+        passport_expiry_date: passport_expiry_date || ''
     };
     if (passport_image !== undefined) updateData.passport_image = passport_image;
     if (license_image !== undefined) updateData.license_image = license_image;
 
-    return db.collection<Client>('clients').updateOne(
+    const result = await db.collection<Client>('clients').updateOne(
       { _id: new ObjectId(id) },
       { $set: updateData }
     );
+
+    // Backup
+    try {
+        const updatedClient = await db.collection<Client>('clients').findOne({ _id: new ObjectId(id) });
+        if (updatedClient) await BackupService.saveClient(updatedClient);
+    } catch (e) { console.error('Backup failed', e); }
+
+    return result;
   },
 
   async delete(id: string) {
@@ -447,6 +480,9 @@ export const RentalModel = {
           driving_license: '$client.driving_license',
           client_address: '$client.address', 
           client_id_number: '$client.id_number',
+          client_date_of_birth: '$client.date_of_birth',
+          client_license_expiry: '$client.license_expiry_date',
+          client_passport_expiry: '$client.passport_expiry_date',
           client_phone: '$client.phone',
         },
       },
@@ -556,7 +592,6 @@ export const RentalModel = {
   async checkOverlap(car_id: string, start_date: string, return_date: string, exclude_rental_id?: string) {
     const db = await getDatabase();
     
-  
     const startUTC = toUTCISO(start_date);
     const endUTC = toUTCISO(return_date);
     
@@ -577,8 +612,28 @@ export const RentalModel = {
       query._id = { $ne: new ObjectId(exclude_rental_id) };
     }
 
-    const count = await db.collection('rentals').countDocuments(query);
-    return count > 0;
+    // Change from countDocuments to find to inspect conflicts
+    const overlappingRentals = await db.collection('rentals').find(query).toArray();
+
+    if (overlappingRentals.length === 0) {
+        return false;
+    }
+
+    // If conflicts exist, check if the Car is explicitly marked 'available'.
+    // If so, these rentals are stale/orphaned (user manually set car to available).
+    const car = await db.collection('cars').findOne({ _id: new ObjectId(car_id) });
+
+    if (car && car.status === 'available') {
+        // Auto-fix stale rentals to 'returned' so they don't block this or future requests for the same slot.
+        const staleIds = overlappingRentals.map(r => r._id);
+        await db.collection('rentals').updateMany(
+            { _id: { $in: staleIds } },
+            { $set: { status: 'returned' } }
+        );
+        return false; // Allow the new reservation
+    }
+
+    return true; // Real conflict
   },
 
   async create(

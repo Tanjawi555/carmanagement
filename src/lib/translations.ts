@@ -107,6 +107,9 @@ export interface Translations {
   id_number: string;
   passport_number: string;
   license_number: string;
+  date_of_birth: string;
+  license_expiry: string;
+  passport_expiry: string;
 }
 
 const TRANSLATIONS: Record<Language, Translations> = {
@@ -217,6 +220,9 @@ const TRANSLATIONS: Record<Language, Translations> = {
     id_number: 'رقم الهوية',
     passport_number: 'رقم جواز السفر',
     license_number: 'رقم رخصة القيادة',
+    date_of_birth: 'تاريخ الميلاد',
+    license_expiry: 'تاريخ انتهاء الرخصة',
+    passport_expiry: 'تاريخ انتهاء الجواز',
   },
   en: {
     app_name: 'Car Rental System',
@@ -325,6 +331,9 @@ const TRANSLATIONS: Record<Language, Translations> = {
     id_number: 'ID Number',
     passport_number: 'Passport Number',
     license_number: 'License Number',
+    date_of_birth: 'Date of Birth',
+    license_expiry: 'License Expiry',
+    passport_expiry: 'Passport Expiry',
   },
   fr: {
     app_name: 'Système de Location de Voitures',
@@ -433,6 +442,9 @@ const TRANSLATIONS: Record<Language, Translations> = {
     id_number: "Numéro d'identité",
     passport_number: 'Numéro de passeport',
     license_number: 'Numéro de permis',
+    date_of_birth: 'Date de naissance',
+    license_expiry: 'Expiration du permis',
+    passport_expiry: 'Expiration du passeport',
   },
 };
 

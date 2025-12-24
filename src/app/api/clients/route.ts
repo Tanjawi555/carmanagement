@@ -26,14 +26,25 @@ export async function POST(request: NextRequest) {
   }
 
   const body = await request.json();
-  const { full_name, passport_id, driving_license, passport_image, license_image, address, id_number } = body;
+  const { full_name, passport_id, driving_license, passport_image, license_image, address, id_number, date_of_birth, license_expiry_date, passport_expiry_date } = body;
 
   if (!full_name) {
     return NextResponse.json({ error: 'Missing fields' }, { status: 400 });
   }
 
   try {
-    await ClientModel.create(full_name, passport_id, driving_license, passport_image, license_image, address, id_number);
+    await ClientModel.create(
+        full_name, 
+        passport_id, 
+        driving_license, 
+        passport_image, 
+        license_image, 
+        address, 
+        id_number, 
+        date_of_birth,
+        license_expiry_date,
+        passport_expiry_date
+    );
     return NextResponse.json({ success: true });
   } catch (error) {
     return NextResponse.json({ error: 'Failed to create client' }, { status: 500 });
@@ -48,7 +59,7 @@ export async function PUT(request: NextRequest) {
   }
 
   const body = await request.json();
-  const { id, full_name, passport_id, driving_license, passport_image, license_image, address, id_number } = body;
+  const { id, full_name, passport_id, driving_license, passport_image, license_image, address, id_number, date_of_birth, license_expiry_date, passport_expiry_date } = body;
 
   if (!id || !full_name) {
     return NextResponse.json({ error: 'Missing fields' }, { status: 400 });
@@ -100,7 +111,19 @@ export async function PUT(request: NextRequest) {
        }
     }
 
-    await ClientModel.update(id, full_name, passport_id, driving_license, passport_image, license_image, address, id_number);
+    await ClientModel.update(
+        id, 
+        full_name, 
+        passport_id, 
+        driving_license, 
+        passport_image, 
+        license_image, 
+        address, 
+        id_number, 
+        date_of_birth,
+        license_expiry_date,
+        passport_expiry_date
+    );
     return NextResponse.json({ success: true });
   } catch (error) {
     return NextResponse.json({ error: 'Failed to update client' }, { status: 500 });

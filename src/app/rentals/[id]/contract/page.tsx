@@ -115,10 +115,13 @@ export default function ContractPage() {
             car_brand: data.car_model || '',
             plate_number: data.plate_number || '',
             client_name: data.client_name || '',
+            birth_date: data.client_date_of_birth || '',
             address_morocco: data.client_address || '',
             cin: data.client_id_number || '', 
             passport: data.passport_id || '',
             license_number: data.driving_license || '',
+            license_expiry: data.client_license_expiry || '',
+            passport_expiry: data.client_passport_expiry || '',
             phone: data.client_phone || '',
             start_date: startStr,
             return_date: returnStr,
@@ -160,49 +163,49 @@ export default function ContractPage() {
     return <div className="text-center p-5 font-bold">Loading Contract...</div>;
   }
 
-  // Styles
-  const mainBorder = "border-[2px] border-[#4a4a4a] overflow-hidden"; // Outer box
-  const colDivider = "border-r-[2px] border-[#4a4a4a]"; // Vertical divider
+  // Styles Updated for better spacing and readability
+  const mainBorder = "border-[2px] border-[#333] overflow-hidden"; // Darker border
+  const colDivider = "border-r-[2px] border-[#333]"; // Vertical divider
   
-  // Tighter styles to prevent overflow
-  const labelStyle = "text-[9px] font-bold text-[#4a4a4a] flex-shrink-0 w-24 truncate"; 
-  const arabicLabelStyle = "text-[9px] font-bold text-[#4a4a4a] flex-shrink-0 w-24 text-right font-serif truncate";
-  const inputStyle = "flex-grow min-w-0 bg-transparent border-b border-[#4a4a4a] border-dotted focus:border-blue-600 outline-none h-4 px-1 text-[10px] font-bold text-[#2d2d2d] text-center mx-1";
+  // Larger fonts, more consistent widths
+  const labelStyle = "text-[10px] font-bold text-[#333] flex-shrink-0 w-32 truncate"; 
+  const inputStyle = "flex-grow min-w-0 bg-transparent border-b border-[#555] border-dotted focus:border-blue-600 outline-none h-5 px-1 text-[11px]  text-[#000] text-center mx-2";
   
-  const gridHeaderStyle = "border-r border-[#4a4a4a] h-full flex items-center justify-center font-bold text-[8px]";
-  const gridCellStyle = "border-r border-[#4a4a4a] h-full relative";
-  const gridInput = "w-full h-full text-center bg-transparent border-none outline-none text-[9px] font-bold absolute top-0 left-0 text-[#2d2d2d]";
+  const gridHeaderStyle = "border-r border-[#333] h-full flex items-center justify-center font-bold text-[9px] bg-gray-50 text-[#333]";
+  const gridCellStyle = "border-r border-[#333] h-full relative";
+  const gridInput = "w-full h-full text-center bg-transparent border-none outline-none text-[11px] font-bold absolute top-0 left-0 text-[#000]";
 
   return (
-    <div className="bg-gray-100 min-h-screen py-8 print:py-0 print:bg-white text-[#4a4a4a] font-sans">
+    <div className="bg-gray-100 min-h-screen py-8 print:py-0 print:bg-white text-[#333] font-sans">
       
       {/* Action Bar */}
       <div className="container mx-auto max-w-[210mm] mt-10 flex justify-between print:hidden px-4">
-        <button onClick={() => router.back()} className="px-3 py-1 bg-gray-700 text-white rounded shadow hover:bg-gray-800 text-sm flex items-center">
+        <button onClick={() => router.back()} className="px-4 py-2 bg-gray-700 text-white rounded shadow hover:bg-gray-800 text-sm flex items-center font-medium transition-colors">
             <i className="bi bi-arrow-left mr-2"></i> Return
         </button>
-        <button onClick={handlePrint} className="px-3 py-1 bg-blue-700 text-white rounded shadow hover:bg-blue-800 text-sm flex items-center">
-            <i className="bi bi-printer mr-2"></i> Print A4 (Image Replica)
+        <button onClick={handlePrint} className="px-4 py-2 bg-blue-700 text-white rounded shadow hover:bg-blue-800 text-sm flex items-center font-medium transition-colors">
+            <i className="bi bi-printer mr-2"></i> Print Contract
         </button>
       </div>
 
       {/* Contract A4 Container */}
-      <div className="mx-auto bg-white shadow-xl print:shadow-none p-4 print:p-0 box-border relative" 
-           style={{ width: '210mm', minHeight: '297mm', padding: '5mm' }}>
+      <div className="mx-auto bg-white shadow-2xl print:shadow-none p-6 print:p-0 box-border relative flex flex-col" 
+           style={{ width: '210mm', minHeight: '297mm', padding: '10mm 8mm' }}>
           
           {/* HEADER SECTION */}
-          <div className="flex justify-between items-center pb-2 mb-2 text-[#4a4a4a]">
+          <div className="flex justify-between items-center pb-4 mb-4 border-b-2 border-[#333]">
                {/* Left: French Info */}
-               <div className="text-center w-[40%]">
-                   <h1 className="text-2xl font-black uppercase tracking-tight mb-1 leading-none text-[#555555] m-0">NARENOS CAR</h1>
-                   <p className="text-[10px] font-bold leading-tight m-0">Hay Lakesibate Rue 1 N° 13 - Tanger</p>
-                   <p className="text-[10px] font-bold leading-tight m-0">GSM : 06 63 20 33 66 - 06 88 63 00 06</p>
+               <div className="tracking-wide">
+                   <h1 className="text-3xl font-black uppercase tracking-tight mb-1 leading-none text-[#333] m-0">NARENOS CAR</h1>
+                   <div className="text-[11px] font-semibold text-[#555] space-y-0.5">
+                        <p className="leading-tight m-0">Hay Lakesibate Rue 1 N° 13 - Tanger</p>
+                        <p className="leading-tight m-0">GSM : 06 63 20 33 66 - 06 88 63 00 06</p>
+                   </div>
                </div>
 
                 {/* Center: Logo */}
-                <div className="w-[20%] flex justify-center items-center">
-                    <div className="relative w-32 h-32">
-                        {/* Using CSS filter to make the black-bg logo printer friendly (Black text on White) */}
+                <div className="flex-grow flex justify-center items-center px-4">
+                    <div className="relative w-28 h-28">
                          <img 
                             src="/narenos-logo.jpg" 
                             alt="Narenos Logo" 
@@ -213,261 +216,258 @@ export default function ContractPage() {
                 </div>
 
                {/* Right: Arabic Info */}
-               <div className="text-center w-[40%]" dir="rtl">
-                   <h1 className="text-2xl font-black uppercase tracking-tight  leading-none text-[#555555] m-0" style={{fontFamily: 'serif'}}>كراء السيارات نرينوس</h1>
-                   <p className="text-[11px] font-bold leading-none m-0">حي القصيبات زنقة 1 رقم 13 - طنجة</p>
-                   <p className="text-[11px] font-bold leading-none m-0" dir="ltr">0688630006 - 0663203366 : الهاتف</p>
+               <div className="text-right" dir="rtl">
+                   <h1 className="text-3xl font-black uppercase tracking-tight leading-none text-[#333] m-0" style={{fontFamily: 'serif'}}>كراء السيارات نرينوس</h1>
+                   <div className="text-[12px] font-bold text-[#555] space-y-0.5 mt-1">
+                        <p className="leading-none m-0">حي القصيبات زنقة 1 رقم 13 - طنجة</p>
+                        <p className="leading-none m-0" dir="ltr">0688630006 - 0663203366 : الهاتف</p>
+                   </div>
                </div>
           </div>
           
           {/* TITLE STRIP */}
-          <div className="flex justify-center items-center gap-4 mb-2 text-[#555555]">
-               <span className="font-black text-xl uppercase tracking-wider">CONTRAT DE LOCATION</span>
-               <span className="font-black text-2xl" style={{fontFamily: 'serif'}}>عقد كراء السيارات</span>
+          <div className="flex justify-center items-center gap-6 mb-4 bg-gray-100 py-1 rounded border border-gray-200">
+               <span className="font-black text-xl uppercase tracking-wider text-[#333]">CONTRAT DE LOCATION</span>
+               <span className="font-black text-2xl text-[#333]" style={{fontFamily: 'serif'}}>عقد كراء السيارات</span>
           </div>
 
           {/* MAIN BODY: 2 COLUMN LAYOUT */}
-          <div className={`${mainBorder} flex h-auto`}>
+          <div className={`${mainBorder} flex flex-grow`}>
               
-              {/* === LEFT COLUMN (55%) === */}
-              <div className={`w-[50%] ${colDivider} p-2 flex flex-col`}>
+              {/* === LEFT COLUMN (52%) === */}
+              <div className={`w-[60%] ${colDivider} p-3 flex flex-col gap-4`}>
                   
                   {/* CAR DETAILS - BOXED */}
-                  <div className="border border-[#4a4a4a] p-2 mb-4">
+                  <div className="border border-[#444] rounded p-2 bg-gray-50/50">
                        {[
                          {l:"Marque :", a:"النوع :", k:"car_brand"},
                          {l:"N° Immatriculation :", a:"رقم التسجيل :", k:"plate_number"},
                          {l:"Lieu de Livraison :", a:"مكان التسليم :", k:"delivery_place"},
                          {l:"Lieu de Reprise :", a:"مكان الاسترجاع :", k:"return_place"}
                        ].map((r, i) => (
-                         <div key={i} className="flex justify-between items-end w-full mb-2">
-                             <span className="text-[10px] font-bold text-[#4a4a4a] flex-shrink-0 w-28 truncate">{r.l}</span>
-                             <input className={inputStyle} value={(contractData as any)[r.k]} onChange={e => setContractData({...contractData, [r.k]: e.target.value})} />
-                             <span className="text-[10px] font-bold text-[#4a4a4a] flex-shrink-0 w-24 text-right font-serif truncate">{r.a}</span>
+                         <div key={i} className="flex justify-between items-center w-full mb-1.5 last:mb-0">
+                             <span className="text-[10px] font-bold text-[#444] w-28 truncate">{r.l}</span>
+                             <input className={`${inputStyle} text-center`} value={(contractData as any)[r.k]} onChange={e => setContractData({...contractData, [r.k]: e.target.value})} />
+                             <span className="text-[10px] font-bold text-[#444] w-24 text-right font-serif truncate">{r.a}</span>
                          </div>
                        ))}
                   </div>
 
                   {/* LOCATAIRE */}
-                  <div className="flex flex-col gap-1 pb-2 border-b-2 border-[#4a4a4a] mb-2">
-                      <div className="flex justify-center items-center gap-4 font-black text-sm uppercase mb-2">
+                  <div className="flex flex-col gap-1 pb-3 border-b-2 border-[#333] border-dashed">
+                      <div className="flex justify-center items-center gap-4 font-black text-sm uppercase bg-[#eee] py-1 rounded mb-2">
                           <span>LOCATAIRE</span> <span style={{fontFamily:'serif'}}>المكتري</span>
                       </div>
-                      {[
-                        {l:"Nom & Prénom :", a:"الإسم العائلي والشخصي :", k:"client_name"},
-                        {l:"Date de naissance :", a:"تاريخ الازدياد :", k:"birth_date"},
-                        {l:"Adresse au Maroc :", a:"العنوان بالمغرب :", k:"address_morocco"},
-                        {l:"Adresse à l'Etranger :", a:"العنوان بالخارج :", k:"address_abroad"},
-                        {l:"Permis de conduire N° :", a:"رخصة السياقة رقم :", k:"license_number"},
-                        {l:"Date d'expiration :", a:"تاريخ الانتهاء :", k:"license_expiry"},
-                        {l:"C.I.N :", a:"رقم البطاقة الوطنية :", k:"cin"},
-                        {l:"Passeport N° :", a:"جواز السفر :", k:"passport"},
-                        {l:"Date d'expiration :", a:"تاريخ الانتهاء :", k:"passport_expiry"},
-                        {l:"Tél :", a:"الهاتف :", k:"phone"},
-                      ].map((r, i) => (
-                        <div key={i} className="flex justify-between items-end w-full mb-2">
-                             <span className={labelStyle}>{r.l}</span>
-                             <input className={inputStyle} value={(contractData as any)[r.k]} onChange={e => setContractData({...contractData, [r.k]: e.target.value})} />
-                             <span className="text-[9px] font-bold text-[#4a4a4a] flex-shrink-0 w-32 text-right font-serif truncate">{r.a}</span>
-                         </div>
-                      ))}
+                      <div className="flex flex-col gap-1.5">
+                        {[
+                            {l:"Nom & Prénom :", a:"الإسم العائلي والشخصي :", k:"client_name"},
+                            {l:"Date de naissance :", a:"تاريخ الازدياد :", k:"birth_date"},
+                            {l:"Adresse au Maroc :", a:"العنوان بالمغرب :", k:"address_morocco"},
+                            {l:"Adresse à l'Etranger :", a:"العنوان بالخارج :", k:"address_abroad"},
+                            {l:"Permis de conduire N° :", a:"رخصة السياقة رقم :", k:"license_number"},
+                            {l:"Date d'expiration :", a:"تاريخ الانتهاء :", k:"license_expiry"},
+                            {l:"C.I.N :", a:"رقم البطاقة الوطنية :", k:"cin"},
+                            {l:"Passeport N° :", a:"جواز السفر :", k:"passport"},
+                            {l:"Date d'expiration :", a:"تاريخ الانتهاء :", k:"passport_expiry"},
+                            {l:"Tél :", a:"الهاتف :", k:"phone"},
+                        ].map((r, i) => (
+                            <div key={i} className="flex justify-between items-end w-full">
+                                <span className={labelStyle}>{r.l}</span>
+                                <input className={inputStyle} value={(contractData as any)[r.k]} onChange={e => setContractData({...contractData, [r.k]: e.target.value})} />
+                                <span className="text-[10px] font-bold text-[#333] flex-shrink-0 w-24 text-right font-serif truncate">{r.a}</span>
+                            </div>
+                        ))}
+                      </div>
                   </div>
 
                   {/* CONDUCTEUR SUPPLEMENTAIRE */}
-                  <div className="flex flex-col gap-1 pt-1">
-                      <div className="flex justify-between items-center px-4 font-black text-xs uppercase mb-2">
+                  <div className="flex flex-col gap-1">
+                      <div className="flex justify-between items-center px-2 font-black text-xs uppercase mb-2 bg-[#eee] py-1 rounded">
                           <span>Le Conducteur Supplémentaire</span> <span style={{fontFamily:'serif'}}>السائق المرخص</span>
                       </div>
-                      {[
-                        {l:"Nom & Prénom :", a:"الإسم العائلي والشخصي :", k:"second_driver_name"},
-                        {l:"Permis de conduire N° :", a:"رخصة السياقة رقم :", k:"second_driver_license"},
-                        {l:"Date d'expiration :", a:"تاريخ الانتهاء :", k:"second_driver_expiry"},
-                        {l:"Passeport N° :", a:"رقم جواز السفر :", k:"second_driver_passport"},
-                        {l:"C.I.N :", a:"رقم البطاقة الوطنية :", k:"second_driver_cin"},
-                      ].map((r, i) => (
-                        <div key={i} className="flex justify-between items-end w-full">
-                             <span className={labelStyle}>{r.l}</span>
-                             <input className={inputStyle} value={(contractData as any)[r.k]} onChange={e => setContractData({...contractData, [r.k]: e.target.value})} />
-                             <span className="text-[9px] font-bold text-[#4a4a4a] flex-shrink-0 w-32 text-right font-serif truncate">{r.a}</span>
-                         </div>
-                      ))}
-                      <div className="flex justify-between items-end mt-2">
-                             <span className={labelStyle}>Caution :</span>
-                             <input className={inputStyle} value={contractData.deposit} onChange={e => setContractData({...contractData, deposit: e.target.value})} />
-                             <span className="text-[9px] font-bold text-[#4a4a4a] flex-shrink-0 w-32 text-right font-serif truncate">ضمانة :</span>
+                      <div className="flex flex-col gap-1.5">
+                          {[
+                            {l:"Nom & Prénom :", a:"الإسم العائلي والشخصي :", k:"second_driver_name"},
+                            {l:"Permis de conduire N° :", a:"رخصة السياقة رقم :", k:"second_driver_license"},
+                            {l:"Date d'expiration :", a:"تاريخ الانتهاء :", k:"second_driver_expiry"},
+                            {l:"Passeport N° :", a:"رقم جواز السفر :", k:"second_driver_passport"},
+                            {l:"C.I.N :", a:"رقم البطاقة الوطنية :", k:"second_driver_cin"},
+                          ].map((r, i) => (
+                            <div key={i} className="flex justify-between items-end w-full">
+                                <span className={labelStyle}>{r.l}</span>
+                                <input className={inputStyle} value={(contractData as any)[r.k]} onChange={e => setContractData({...contractData, [r.k]: e.target.value})} />
+                                <span className="text-[10px] font-bold text-[#333] flex-shrink-0 w-24 text-right font-serif truncate">{r.a}</span>
+                            </div>
+                          ))}
+                         
                       </div>
                   </div>
 
               </div>
 
-              {/* === RIGHT COLUMN (45%) === */}
-              <div className="w-[50%] p-2 flex flex-col overflow-hidden">
+              {/* === RIGHT COLUMN (48%) === */}
+              <div className="w-[40%] p-3 flex flex-col justify-between">
                   
-                  {/* Warning Text */}
-                  <div className="text-[9px] text-right font-bold leading-tight m-0" dir="rtl" style={{fontFamily:'serif'}}>
-                      <p>- بعد انتهاء صلاحية هذا العقد تعد السياقة غير قانونية ويعرض السائق للعقوبات الجاري بها العمل.</p>
-                      <p>- لا يسمح لغير السائق المسجل في العقد سياقة هذه المركبة بدون حصول على إذن من الوكالة</p>
-                  </div>
+                  <div>
+                    {/* Warning Text */}
+                    <div className="text-[10px] text-right font-bold leading-snug mb-3 p-2 border border-red-200 bg-red-50/50 rounded" dir="rtl" style={{fontFamily:'serif'}}>
+                        <p className="mb-1">- بعد انتهاء صلاحية هذا العقد تعد السياقة غير قانونية ويعرض السائق للعقوبات الجاري بها العمل.</p>
+                        <p className="m-0">- لا يسمح لغير السائق المسجل في العقد سياقة هذه المركبة بدون حصول على إذن من الوكالة</p>
+                    </div>
 
-                  {/* Date Grid */}
-                  <div className={`border-2 border-[#4a4a4a] mb-2`}>
-                      <div className="grid grid-cols-[25%_1fr_1fr_1fr_1fr_1fr] h-6 border-b-2 border-[#4a4a4a]">
-                          <div className={gridHeaderStyle}></div>
-                          <div className={gridHeaderStyle}>J</div>
-                          <div className={gridHeaderStyle}>M</div>
-                          <div className={gridHeaderStyle}>A</div>
-                          <div className={gridHeaderStyle}>H</div>
-                          <div className="h-full flex items-center justify-center font-bold text-[10px]">mn</div>
-                      </div>
-                      
-                      {/* Helper to update date parts */}
-                      {(() => {
-                           const updateDate = (field: 'start_date' | 'return_date', part: 'day'|'month'|'year'|'hour'|'minute', val: string) => {
-                               let v = parseInt(val);
-                               if (isNaN(v)) v = 0;
-                               
-                               // Get current string
-                               let s = contractData[field] as string;
-                               if (typeof s !== 'string') s = toBusinessInputString(s as any);
-                               
-                               // Parse parts correctly from YYYY-MM-DDTHH:mm
-                               let year = parseInt(s.slice(0, 4));
-                               let month = parseInt(s.slice(5, 7));
-                               let day = parseInt(s.slice(8, 10));
-                               let hour = parseInt(s.slice(11, 13));
-                               let minute = parseInt(s.slice(14, 16));
+                    {/* Date Grid */}
+                    <div className={`border-2 border-[#333] mb-4 shadow-sm`}>
+                        <div className="grid grid-cols-[25%_1fr_1fr_1fr_1fr_1fr] h-8 border-b-2 border-[#333] bg-gray-100">
+                            <div className={gridHeaderStyle}></div>
+                            <div className={gridHeaderStyle}>J</div>
+                            <div className={gridHeaderStyle}>M</div>
+                            <div className={gridHeaderStyle}>A</div>
+                            <div className={gridHeaderStyle}>H</div>
+                            <div className="h-full flex items-center justify-center font-bold text-[10px] text-[#333]">mn</div>
+                        </div>
+                        
+                        {/* Helper to update date parts */}
+                        {(() => {
+                            const updateDate = (field: 'start_date' | 'return_date', part: 'day'|'month'|'year'|'hour'|'minute', val: string) => {
+                                let v = parseInt(val);
+                                if (isNaN(v)) v = 0;
+                                let s = contractData[field] as string;
+                                if (typeof s !== 'string') s = toBusinessInputString(s as any);
+                                let year = parseInt(s.slice(0, 4));
+                                let month = parseInt(s.slice(5, 7));
+                                let day = parseInt(s.slice(8, 10));
+                                let hour = parseInt(s.slice(11, 13));
+                                let minute = parseInt(s.slice(14, 16));
+                                if (part === 'day') day = v;
+                                if (part === 'month') month = v;
+                                if (part === 'year') year = 2000 + v; 
+                                if (part === 'hour') hour = v;
+                                if (part === 'minute') minute = v;
+                                const d = new Date(year, month - 1, day, hour, minute);
+                                const ny = d.getFullYear();
+                                const nm = (d.getMonth() + 1).toString().padStart(2, '0');
+                                const nd = d.getDate().toString().padStart(2, '0');
+                                const nh = d.getHours().toString().padStart(2, '0');
+                                const nmin = d.getMinutes().toString().padStart(2, '0');
+                                const newStr = `${ny}-${nm}-${nd}T${nh}:${nmin}`;
+                                setContractData({...contractData, [field]: newStr});
+                            };
 
-                               if (part === 'day') day = v;
-                               if (part === 'month') month = v;
-                               if (part === 'year') year = 2000 + v; // Input is YY
-                               if (part === 'hour') hour = v;
-                               if (part === 'minute') minute = v;
+                            return [
+                              {l:"Départ", a:"الانطلاق", f: 'start_date' as const},
+                              {l:"Retour", a:"الرجوع", f: 'return_date' as const},
+                            ].map((r, i) => (
+                              <div key={i} className="grid grid-cols-[25%_1fr_1fr_1fr_1fr_1fr] h-9 border-b border-[#333] items-stretch">
+                                  <div className={`${gridHeaderStyle} flex-col !justify-center leading-none gap-0.5`}>
+                                      <span>{r.l}</span><span style={{fontFamily:'serif'}}>{r.a}</span>
+                                  </div>
+                                  <div className={gridCellStyle}><input className={gridInput} value={formatDatePart(contractData[r.f], 'day')} onChange={e=>updateDate(r.f, 'day', e.target.value)} /></div>
+                                  <div className={gridCellStyle}><input className={gridInput} value={formatDatePart(contractData[r.f], 'month')} onChange={e=>updateDate(r.f, 'month', e.target.value)} /></div>
+                                  <div className={gridCellStyle}><input className={gridInput} value={formatDatePart(contractData[r.f], 'year_short')} onChange={e=>updateDate(r.f, 'year', e.target.value)} /></div>
+                                  <div className={gridCellStyle}><input className={gridInput} value={formatDatePart(contractData[r.f], 'hour')} onChange={e=>updateDate(r.f, 'hour', e.target.value)} /></div>
+                                  <div className="h-full relative"><input className={gridInput} value={formatDatePart(contractData[r.f], 'minute')} onChange={e=>updateDate(r.f, 'minute', e.target.value)} /></div>
+                              </div>
+                            ));
+                        })()}
+                        
+                        {/* Retour Definitif (Manual/Empty) */}
+                        <div className="grid grid-cols-[25%_1fr_1fr_1fr_1fr_1fr] h-9 border-b border-[#333] items-stretch">
+                              <div className={`${gridHeaderStyle} flex-col !justify-center leading-none gap-0.5`}>
+                                  <span>Retour D&eacute;finitif</span><span style={{fontFamily:'serif'}}>الرجوع النهائي</span>
+                              </div>
+                              <div className={gridCellStyle}></div><div className={gridCellStyle}></div><div className={gridCellStyle}></div><div className={gridCellStyle}></div><div className="h-full relative"></div>
+                        </div>
 
-                               // Simple overflow handling using Date (Local)
-                               // Create date from parts (Month is 0-indexed in Date constructor)
-                               const d = new Date(year, month - 1, day, hour, minute);
-                               
-                               // Format back to YYYY-MM-DDTHH:mm manually to avoid timezone issues
-                               const ny = d.getFullYear();
-                               const nm = (d.getMonth() + 1).toString().padStart(2, '0');
-                               const nd = d.getDate().toString().padStart(2, '0');
-                               const nh = d.getHours().toString().padStart(2, '0');
-                               const nmin = d.getMinutes().toString().padStart(2, '0');
-                               
-                               const newStr = `${ny}-${nm}-${nd}T${nh}:${nmin}`;
-                               setContractData({...contractData, [field]: newStr});
-                           };
+                        <div className="grid grid-cols-[25%_1fr] h-8 items-stretch bg-gray-50">
+                            <div className={`${gridHeaderStyle} flex-col !justify-center leading-none gap-0.5`}>
+                                <span>Durée</span><span style={{fontFamily:'serif'}}>المدة</span>
+                            </div>
+                            <div className="relative h-full"><input className={`${gridInput} font-black text-sm`} value={contractData.days} onChange={e=>setContractData({...contractData, days: e.target.value})} /></div>
+                        </div>
+                    </div>
 
-                           return [
-                            {l:"Départ", a:"الانطلاق", f: 'start_date' as const},
-                            {l:"Retour", a:"الرجوع", f: 'return_date' as const},
-                           ].map((r, i) => (
-                             <div key={i} className="grid grid-cols-[25%_1fr_1fr_1fr_1fr_1fr] h-7 border-b border-[#4a4a4a] items-stretch">
-                                <div className={`${gridHeaderStyle} flex-col !justify-center leading-[0.8]`}>
-                                    <span>{r.l}</span><span style={{fontFamily:'serif'}}>{r.a}</span>
+                    {/* Checkboxes */}
+                    <div className="mb-4 pl-1">
+                        <div className="font-bold text-[11px] mb-2 px-1 border-b border-gray-300 inline-block uppercase tracking-wide">État au Départ</div>
+                        <div className="flex gap-6 px-2 mb-2">
+                            {/* Dommage */}
+                            <div className="flex flex-col gap-1 cursor-pointer group" onClick={() => setContractData({...contractData, damage_type: 'damage'})}>
+                                <div className="flex items-center gap-2">
+                                    <div className={`w-5 h-5 border-2 border-[#333] flex items-center justify-center transition-all ${contractData.damage_type === 'damage' ? 'bg-[#333]' : 'bg-white'}`}>
+                                        {contractData.damage_type === 'damage' && <i className="bi bi-check text-white text-xs"></i>}
+                                    </div>
+                                    <span className="font-bold text-[11px] group-hover:underline">Dommage</span>
                                 </div>
-                                <div className={gridCellStyle}><input className={gridInput} value={formatDatePart(contractData[r.f], 'day')} onChange={e=>updateDate(r.f, 'day', e.target.value)} /></div>
-                                <div className={gridCellStyle}><input className={gridInput} value={formatDatePart(contractData[r.f], 'month')} onChange={e=>updateDate(r.f, 'month', e.target.value)} /></div>
-                                <div className={gridCellStyle}><input className={gridInput} value={formatDatePart(contractData[r.f], 'year_short')} onChange={e=>updateDate(r.f, 'year', e.target.value)} /></div>
-                                <div className={gridCellStyle}><input className={gridInput} value={formatDatePart(contractData[r.f], 'hour')} onChange={e=>updateDate(r.f, 'hour', e.target.value)} /></div>
-                                <div className="h-full relative"><input className={gridInput} value={formatDatePart(contractData[r.f], 'minute')} onChange={e=>updateDate(r.f, 'minute', e.target.value)} /></div>
+                                <div className="text-[10px] leading-tight text-gray-600 pl-1 italic">
+                                      Damage / Daño
+                                </div>
                             </div>
-                           ));
-                      })()}
-                      
-                      {/* Retour Definitif (Manual/Empty) */}
-                      <div className="grid grid-cols-[25%_1fr_1fr_1fr_1fr_1fr] h-7 border-b border-[#4a4a4a] items-stretch">
-                            <div className={`${gridHeaderStyle} flex-col !justify-center leading-[0.8]`}>
-                                <span>Retour D&eacute;finitif</span><span style={{fontFamily:'serif'}}>الرجوع النهائي</span>
+                            
+                            {/* Non Dommage */}
+                            <div className="flex flex-col gap-1 cursor-pointer group" onClick={() => setContractData({...contractData, damage_type: 'none'})}>
+                                <div className="flex items-center gap-2">
+                                     <div className={`w-5 h-5 border-2 border-[#333] flex items-center justify-center transition-all ${contractData.damage_type === 'none' ? 'bg-[#333]' : 'bg-white'}`}>
+                                         {contractData.damage_type === 'none' && <i className="bi bi-check text-white text-xs"></i>}
+                                     </div>
+                                     <span className="font-bold text-[11px] group-hover:underline">Non Dommage</span>
+                                </div>
+                                <div className="text-[10px] leading-tight text-gray-600 pl-1 italic">
+                                      No Damage / Sin Daño
+                                </div>
                             </div>
-                            <div className={gridCellStyle}></div><div className={gridCellStyle}></div><div className={gridCellStyle}></div><div className={gridCellStyle}></div><div className="h-full relative"></div>
-                      </div>
-
-                      <div className="grid grid-cols-[25%_1fr] h-6 items-stretch">
-                          <div className={`${gridHeaderStyle} flex-col !justify-center leading-[0.8]`}>
-                              <span>Durée</span><span style={{fontFamily:'serif'}}>المدة</span>
-                          </div>
-                          <div className="relative h-full"><input className={gridInput} value={contractData.days} onChange={e=>setContractData({...contractData, days: e.target.value})} /></div>
-                      </div>
-                  </div>
-
-                  {/* Checkboxes */}
-                  <div className="mb-2 pl-2">
-                      <div className="font-bold text-[10px] mb-2 px-2">Départ Avant de prendre la voiture</div>
-                      <div className="flex gap-8 px-4 mb-2">
-                           {/* Dommage */}
-                           <div className="flex flex-col gap-1 cursor-pointer" onClick={() => setContractData({...contractData, damage_type: 'damage'})}>
-                               <div className="flex items-center gap-2">
-                                   <span className="font-bold text-[10px]">Dommage</span>
-                                   <div className={`w-5 h-5 border border-[#4a4a4a] ${contractData.damage_type === 'damage' ? 'bg-[#4a4a4a]' : 'bg-white'}`}></div>
-                               </div>
-                               <div className="text-[9px] leading-tight text-gray-600 pl-1">
-                                    Damage<br/>Daño
-                               </div>
-                           </div>
-                           
-                           {/* Non Dommage */}
-                           <div className="flex flex-col gap-1 cursor-pointer" onClick={() => setContractData({...contractData, damage_type: 'none'})}>
-                               <div className="flex items-center gap-2">
-                                    <span className="font-bold text-[10px]">Non Dommage</span>
-                                    <div className={`w-5 h-5 border border-[#4a4a4a] ${contractData.damage_type === 'none' ? 'bg-[#4a4a4a]' : 'bg-white'}`}></div>
-                               </div>
-                               <div className="text-[9px] leading-tight text-gray-600 pl-1">
-                                    No Damage<br/>Sin Daño
-                               </div>
-                           </div>
-                      </div>
+                        </div>
+                    </div>
                   </div>
 
                   {/* Diagram & Comments */}
-                  <div className="flex gap-1 h-[90mm] overflow-hidden">
+                  <div className="flex gap-2 h-[80mm] mb-1">
                        
                        {/* Left: Car Diagram - Exploded View */}
                        <div className="w-[45%] relative flex justify-center pt-2">
-                           <span className="absolute top-0 left-0 font-black text-xl z-10 leading-none">AR</span>
-                           <span className="absolute bottom-0 left-0 font-black text-xl z-10 leading-none">AV</span>
+                           <span className="absolute top-1 left-2 font-black text-xl z-10 leading-none text-[#333]">AR</span>
+                           <span className="absolute bottom-1 left-2 font-black text-xl z-10 leading-none text-[#333]">AV</span>
                            
                            {/* Exploded View Diagram */}
-                           <svg viewBox="0 0 100 180" className="h-[95%] w-full overflow-visible">
+                           <svg viewBox="0 0 100 180" className="h-[95%] w-full overflow-visible p-2">
                                 {/* Center - Roof/Cabin */}
-                                <path d="M25,60 L75,60 L75,120 L25,120 Z" fill="none" stroke="#4a4a4a" strokeWidth="1.5" />
+                                <path d="M25,60 L75,60 L75,120 L25,120 Z" fill="none" stroke="#333" strokeWidth="1.5" />
                                 {/* Windshield Line */}
-                                <path d="M25,120 Q50,125 75,120" fill="none" stroke="#4a4a4a" strokeWidth="1" />
+                                <path d="M25,120 Q50,125 75,120" fill="none" stroke="#333" strokeWidth="1" />
                                 {/* Rear Window Line */}
-                                <path d="M25,60 Q50,55 75,60" fill="none" stroke="#4a4a4a" strokeWidth="1" />
+                                <path d="M25,60 Q50,55 75,60" fill="none" stroke="#333" strokeWidth="1" />
 
                                 {/* Top - Rear (Trunk/Bumper) */}
-                                <path d="M30,55 L20,40 Q25,20 50,20 Q75,20 80,40 L70,55" fill="none" stroke="#4a4a4a" strokeWidth="1.5" />
-                                <circle cx="30" cy="30" r="3" fill="none" stroke="#4a4a4a" strokeWidth="1" /> 
-                                <circle cx="70" cy="30" r="3" fill="none" stroke="#4a4a4a" strokeWidth="1" />
-                                <path d="M30,55 Q50,50 70,55" fill="none" stroke="#4a4a4a" strokeWidth="1" />
+                                <path d="M30,55 L20,40 Q25,20 50,20 Q75,20 80,40 L70,55" fill="none" stroke="#333" strokeWidth="1.5" />
+                                <circle cx="30" cy="30" r="3" fill="none" stroke="#333" strokeWidth="1" /> 
+                                <circle cx="70" cy="30" r="3" fill="none" stroke="#333" strokeWidth="1" />
+                                <path d="M30,55 Q50,50 70,55" fill="none" stroke="#333" strokeWidth="1" />
                                 
                                 {/* Bottom - Front (Hood/Bumper) */}
-                                <path d="M30,125 L20,140 Q25,160 50,160 Q75,160 80,140 L70,125" fill="none" stroke="#4a4a4a" strokeWidth="1.5" />
-                                <path d="M40,155 L60,155 L55,160 L45,160 Z" fill="none" stroke="#4a4a4a" strokeWidth="1" /> 
-                                <path d="M30,125 Q50,130 70,125" fill="none" stroke="#4a4a4a" strokeWidth="1" />
+                                <path d="M30,125 L20,140 Q25,160 50,160 Q75,160 80,140 L70,125" fill="none" stroke="#333" strokeWidth="1.5" />
+                                <path d="M40,155 L60,155 L55,160 L45,160 Z" fill="none" stroke="#333" strokeWidth="1" /> 
+                                <path d="M30,125 Q50,130 70,125" fill="none" stroke="#333" strokeWidth="1" />
 
                                 {/* Left Side - Doors */}
-                                <path d="M25,65 L10,65 Q5,90 10,115 L25,115" fill="none" stroke="#4a4a4a" strokeWidth="1.5" />
-                                <line x1="10" y1="90" x2="25" y2="90" stroke="#4a4a4a" strokeWidth="1" />
+                                <path d="M25,65 L10,65 Q5,90 10,115 L25,115" fill="none" stroke="#333" strokeWidth="1.5" />
+                                <line x1="10" y1="90" x2="25" y2="90" stroke="#333" strokeWidth="1" />
 
                                 {/* Right Side - Doors */}
-                                <path d="M75,65 L90,65 Q95,90 90,115 L75,115" fill="none" stroke="#4a4a4a" strokeWidth="1.5" />
-                                <line x1="90" y1="90" x2="75" y2="90" stroke="#4a4a4a" strokeWidth="1" />
+                                <path d="M75,65 L90,65 Q95,90 90,115 L75,115" fill="none" stroke="#333" strokeWidth="1.5" />
+                                <line x1="90" y1="90" x2="75" y2="90" stroke="#333" strokeWidth="1" />
                            </svg>
                        </div>
 
                        {/* Right: Comments List */}
-                       <div className="w-[55%] pt-2 pl-2">
-                           <h3 className="font-bold text-sm mb-1 text-right">Commentaires</h3>
-                           <p className="text-[8px] leading-tight mb-2 text-justify">
+                       <div className="w-[55%] pt-1 pl-1 flex flex-col">
+                           <h3 className="font-bold text-xs mb-1 text-right border-b border-[#333] inline-block self-end">Commentaires</h3>
+                           <p className="text-[9px] leading-tight mb-2 text-justify text-gray-600">
                                Positionner les Numeros à l'endroit précis du Dommage sur la matrice à droite.
                            </p>
-                           <div className="flex flex-col gap-3">
+                           <div className="flex flex-col gap-3 flex-grow">
                                {[0,1,2,3,4].map((i) => (
-                                   <div key={i} className="flex gap-1 items-end w-full">
-                                       <span className="font-bold text-[10px] w-3">{i+1}</span>
-                                       <input className="flex-grow min-w-0 border-b border-[#4a4a4a] border-dotted bg-transparent outline-none text-[10px]" 
+                                   <div key={i} className="flex gap-2 items-end w-full">
+                                       <div className="font-bold text-[11px] w-4 h-4 rounded-full bg-black text-white flex items-center justify-center flex-shrink-0">{i+1}</div>
+                                       <input className="flex-grow min-w-0 border-b border-[#333] border-dotted bg-transparent outline-none text-[11px] px-1" 
                                               value={contractData.comments[i]}
                                               onChange={(e) => {
                                                   const newComments = [...contractData.comments];
@@ -484,27 +484,27 @@ export default function ContractPage() {
           </div>
           
           {/* FOOTER SECTION: PAYMENTS & SIGNATURES */}
-          <div className="mt-2 text-[#4a4a4a] px-1">
+          <div className="mt-4 text-[#333] px-1">
 
                {/* Row 1: Pre-payment & Prices */}
-               <div className="flex justify-between items-center mb-3">
+               <div className="flex justify-between items-center mb-4">
                    {/* Label Box - Pill Shape */}
-                   <div className="w-[42%] border border-[#4a4a4a] rounded-[15px] h-12 flex flex-col justify-center px-4 shadow-sm">
-                       <span className="font-bold text-base leading-none text-[#555555]">Pré-paiement</span>
-                       <span className="font-bold text-base leading-none text-[#999999]">Prépayement</span>
+                   <div className="w-[42%] border-2 border-[#333] rounded-[18px] h-14 flex flex-col justify-center px-5 shadow bg-gray-50">
+                       <span className="font-black text-lg leading-none text-[#333] uppercase">Pré-paiement</span>
+                       <span className="font-bold text-sm leading-none text-[#777] mt-1">Prépayement</span>
                    </div>
                    
                    {/* Price Inputs */}
-                   <div className="w-[56%] flex gap-3">
+                   <div className="w-[56%] flex gap-4">
                        {[
                            {l:'Total', sub:'Total', k:'total'},
                            {l:'Avance', sub:'Avance', k:'advance'},
                            {l:'Reste', sub:'Rest', k:'remaining'},
                        ].map((item, i) => (
-                           <div key={i} className="flex-1 border border-[#4a4a4a] h-12 relative">
-                               <div className="absolute top-1 left-1 text-[9px] font-bold leading-none">{item.l}</div>
-                               <div className="absolute bottom-1 left-1 text-[9px] font-bold leading-none text-gray-500">{item.sub}</div>
-                               <input className="w-full h-full text-right font-bold bg-transparent outline-none text-sm px-2 pt-2" 
+                           <div key={i} className="flex-1 border-2 border-[#333] h-14 relative bg-white">
+                               <div className="absolute top-1.5 left-2 text-[10px] font-black uppercase tracking-wider">{item.l}</div>
+                               <div className="absolute bottom-1.5 left-2 text-[9px] font-bold text-gray-500 uppercase">{item.sub}</div>
+                               <input className="w-full h-full text-right font-black bg-transparent outline-none text-lg px-3 pt-3" 
                                       value={(contractData as any)[item.k]}
                                       onChange={e => setContractData({...contractData, [item.k]: e.target.value})} />
                            </div>
@@ -513,97 +513,96 @@ export default function ContractPage() {
                </div>
 
                {/* Row 2: Payment Method */}
-               <div className="flex justify-between items-center mb-4">
+               <div className="flex justify-between items-center mb-5">
                    {/* Label Box - Pill Shape */}
-                   <div className="w-[38%] border border-[#4a4a4a] rounded-[15px] h-12 flex flex-col justify-center px-4 shadow-sm">
-                       <span className="font-bold text-base leading-none text-[#555555]">Mode de paiement</span>
-                       <span className="font-bold text-base leading-none text-[#999999]">Payment method</span>
+                   <div className="w-[38%] border border-[#333] rounded-[18px] h-12 flex flex-col justify-center px-5 bg-gray-50/50">
+                       <span className="font-bold text-base leading-none text-[#333]">Mode de paiement</span>
+                       <span className="font-semibold text-sm leading-none text-[#777] mt-0.5">Payment method</span>
                    </div>
 
                    {/* Checkboxes */}
-                   <div className="w-[60%] flex gap-4 pl-1">
+                   <div className="w-[60%] flex gap-6 pl-2">
                        {[
                            {l:'En espèces', sub:'Cash', val:'cash'},
                            {l:'Chèque', sub:'Check', val:'check'},
                            {l:'Carte', sub:'TPE', val:'card'},
                        ].map((m, i) => (
-                           <div key={i} className="flex items-center justify-end gap-2 flex-1 cursor-pointer" onClick={() => setContractData({...contractData, payment_method: m.val})}>
-                               <div className="text-right leading-[0.9]">
-                                   <div className="font-bold text-[10px] text-[#4a4a4a]">{m.l}</div>
-                                   <div className="text-[10px] text-gray-500">{m.sub}</div>
+                           <div key={i} className="flex items-center justify-end gap-3 flex-1 cursor-pointer group" onClick={() => setContractData({...contractData, payment_method: m.val})}>
+                               <div className="text-right leading-[1.0]">
+                                   <div className="font-bold text-[11px] text-[#333] uppercase group-hover:underline">{m.l}</div>
+                                   <div className="text-[10px] text-gray-500 italic">{m.sub}</div>
                                </div>
-                               <div className={`w-5 h-5 border border-[#4a4a4a] flex-shrink-0 ${contractData.payment_method === m.val ? 'bg-[#4a4a4a]' : 'bg-white'}`}></div>
+                               <div className={`w-6 h-6 border-2 border-[#333] flex-shrink-0 flex items-center justify-center transition-colors ${contractData.payment_method === m.val ? 'bg-[#333]' : 'bg-white'}`}>
+                                    {contractData.payment_method === m.val && <i className="bi bi-check-lg text-white font-bold"></i>}
+                               </div>
                            </div>
                        ))}
                    </div>
                </div>
 
                {/* Signatures Row */}
-               <div className="mt-1 relative">
+               <div>
                    
-                   {/* Top Text Row */}
-                   <div className="flex items-start mb-4">
-                       <div className="text-[9px] leading-[1.1] text-justify w-[35%] tracking-tighter">
-                           Je reconnais avoir pris connaissance des présentes<br/>
-                           conditions générales (recto et verso)<br/>
-                           que je m'engage à les respecter.
-                       </div>
+                 
 
-                       <div className="text-center w-[65%] pl-4">
-                            <p className="font-bold text-[11px] leading-tight m-0">Observation : En cas d'accident ou de vol, je m'engage à régler la valeur de la franchise.</p>
-                            <p className="font-bold text-[11px] leading-tight m-0">avec présentation du P.V</p>
-                       </div>
-                   </div>
-
-                   {/* Signatures Row */}
-                   <div className="grid grid-cols-3 gap-4 items-end px-2">
+                   {/* Signatures Grid */}
+                   <div className="grid grid-cols-3 gap-6 items-end px-2">
                        {/* Client 1 */}
                        <div className="flex flex-col items-center">
-                           <div className="font-black text-sm text-[#4a4a4a] mb-2">Signature Client</div>
+                           <div className="font-black text-sm text-[#333] mb-3 uppercase tracking-wider relative after:content-[''] after:absolute after:bottom-[-4px] after:left-1/2 after:-translate-x-1/2 after:w-1/2 after:h-[1px] after:bg-[#333]">Signature Client</div>
                            <div 
-                                className="w-full h-24 border border-[#ccc] rounded cursor-pointer relative flex items-center justify-center hover:bg-gray-50 bg-white"
+                                className="w-full h-28 border-2 border-[#ccc] rounded-lg cursor-pointer relative flex items-center justify-center hover:bg-gray-50 bg-white shadow-inner transition-colors"
                                 onClick={() => setActiveSignField('client')}
                            >
                                 {signatures.client ? (
-                                    <img src={signatures.client} alt="Signed" className="max-h-full max-w-full object-contain" />
+                                    <img src={signatures.client} alt="Signed" className="max-h-full max-w-full object-contain p-2" />
                                 ) : (
-                                    <span className="text-[10px] text-gray-400 print:hidden">Click to Sign</span>
+                                    <div className="text-center text-gray-300 print:hidden">
+                                        <i className="bi bi-pen text-2xl mb-1 block"></i>
+                                        <span className="text-[10px]">Click to Sign</span>
+                                    </div>
                                 )} 
                            </div>
                        </div>
                        
                        {/* Client 2 */}
                        <div className="flex flex-col items-center">
-                           <div className="font-black text-sm text-[#4a4a4a] mb-2">Signature Client</div>
+                           <div className="font-black text-sm text-[#333] mb-3 uppercase tracking-wider relative after:content-[''] after:absolute after:bottom-[-4px] after:left-1/2 after:-translate-x-1/2 after:w-1/2 after:h-[1px] after:bg-[#333]">Signature Client</div>
                            <div 
-                                className="w-full h-24 border border-[#ccc] rounded cursor-pointer relative flex items-center justify-center hover:bg-gray-50 bg-white"
+                                className="w-full h-28 border-2 border-[#ccc] rounded-lg cursor-pointer relative flex items-center justify-center hover:bg-gray-50 bg-white shadow-inner transition-colors"
                                 onClick={() => setActiveSignField('client2')}
                            >
                                 {signatures.client2 ? (
-                                    <img src={signatures.client2} alt="Signed" className="max-h-full max-w-full object-contain" />
+                                    <img src={signatures.client2} alt="Signed" className="max-h-full max-w-full object-contain p-2" />
                                 ) : (
-                                    <span className="text-[10px] text-gray-400 print:hidden">Click to Sign</span>
+                                    <div className="text-center text-gray-300 print:hidden">
+                                        <i className="bi bi-pen text-2xl mb-1 block"></i>
+                                        <span className="text-[10px]">Click to Sign</span>
+                                    </div>
                                 )}
                            </div>
                        </div>
 
                        {/* Agency */}
                        <div className="flex flex-col items-end">
-                           <div className="font-bold text-[11px] italic mb-1 text-right w-full">
-                               Fait à Tanger le : _________________
+                           <div className="font-bold text-[12px] italic mb-2 text-right w-full">
+                               Fait à Tanger le : <span className="inline-block w-24 border-b border-black"></span>
                            </div>
                            
-                           <div className="font-black text-xl tracking-widest text-[#4a4a4a] mb-1 text-right w-full">
+                           <div className="font-black text-xl tracking-[0.2em] text-[#333] mb-1 text-center w-full uppercase">
                                NARENOS
                            </div>
                            <div 
-                                className="w-full h-20 border border-[#ccc] rounded cursor-pointer relative flex items-center justify-center hover:bg-gray-50 bg-white"
+                                className="w-full h-24 border-2 border-[#ccc] rounded-lg cursor-pointer relative flex items-center justify-center hover:bg-gray-50 bg-white shadow-inner transition-colors"
                                 onClick={() => setActiveSignField('agency')}
                            >
                                 {signatures.agency ? (
-                                    <img src={signatures.agency} alt="Signed" className="max-h-full max-w-full object-contain" />
+                                    <img src={signatures.agency} alt="Signed" className="max-h-full max-w-full object-contain p-2" />
                                 ) : (
-                                    <span className="text-[10px] text-gray-400 print:hidden">Click to Sign</span>
+                                    <div className="text-center text-gray-300 print:hidden">
+                                        <i className="bi bi-pen text-2xl mb-1 block"></i>
+                                        <span className="text-[10px]">Click to Sign</span>
+                                    </div>
                                 )}
                            </div>
                        </div>
@@ -614,23 +613,26 @@ export default function ContractPage() {
       </div>
       {/* Signature Modal */}
       {activeSignField && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black bg-opacity-50 select-none print:hidden">
-            <div className="bg-white p-4 rounded-xl shadow-2xl w-[90%] max-w-md animate-fade-in-up">
-                <h3 className="text-lg font-bold mb-3 text-center">
-                    Sign Here ({activeSignField === 'client' ? 'Client' : activeSignField === 'client2' ? 'Client 2' : 'Agency'})
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-sm select-none print:hidden">
+            <div className="bg-white p-6 rounded-2xl shadow-2xl w-[90%] max-w-md animate-fade-in-up">
+                <h3 className="text-xl font-bold mb-4 text-center">
+                    Sign Here <span className="text-blue-600">({activeSignField === 'client' ? 'Client' : activeSignField === 'client2' ? 'Client 2' : 'Agency'})</span>
                 </h3>
-                <div className="border-2 border-dashed border-gray-300 rounded mb-4 h-48 bg-gray-50 overflow-hidden">
+                <div className="border-2 border-dashed border-gray-300 rounded-xl mb-6 h-56 bg-gray-50 overflow-hidden relative group hover:border-blue-400 transition-colors">
                     <SignatureCanvas 
                         ref={sigCanvas} 
                         penColor="black"
                         backgroundColor="rgba(0,0,0,0)"
-                        canvasProps={{className: 'w-full h-full'}} 
+                        canvasProps={{className: 'w-full h-full cursor-crosshair'}} 
                     />
+                    <div className="absolute inset-0 pointer-events-none flex items-center justify-center opacity-10 group-hover:opacity-0 transition-opacity">
+                         <span className="text-4xl font-handwriting text-gray-400">Sign Here</span>
+                    </div>
                 </div>
-                <div className="flex justify-between gap-2">
-                    <button onClick={() => setActiveSignField(null)} className="btn btn-secondary flex-1">Cancel</button>
-                    <button onClick={clearSignature} className="btn btn-warning flex-1">Clear</button>
-                    <button onClick={handleSaveSignature} className="btn btn-primary flex-1">Save</button>
+                <div className="flex justify-between gap-3">
+                    <button onClick={() => setActiveSignField(null)} className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg font-medium transition-colors flex-1">Cancel</button>
+                    <button onClick={clearSignature} className="px-4 py-2 bg-yellow-100 text-yellow-700 hover:bg-yellow-200 rounded-lg font-medium transition-colors flex-1">Clear</button>
+                    <button onClick={handleSaveSignature} className="px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded-lg font-medium transition-colors flex-1 shadow-md">Save Signature</button>
                 </div>
             </div>
         </div>
