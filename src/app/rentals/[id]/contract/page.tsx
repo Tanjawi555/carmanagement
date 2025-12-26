@@ -182,13 +182,31 @@ export default function ContractPage() {
   const labelStyle = "text-[10px] font-bold text-black flex-shrink-0 w-32 truncate"; 
   const inputStyle = "flex-grow min-w-0 bg-transparent border-b border-black border-dotted focus:border-blue-600 outline-none h-5 px-1 text-[11px]  text-black text-center mx-2";
   
-  const gridHeaderStyle = "border-r border-black h-full flex items-center justify-center font-bold text-[9px] bg-white text-black";
-  const gridCellStyle = "border-r border-black h-full relative";
+  const gridHeaderStyle = "border-r-2 border-black h-full flex items-center justify-center font-bold text-[9px] bg-white text-black";
+  const gridCellStyle = "border-r-2 border-black h-full relative";
   const gridInput = "w-full h-full text-center bg-transparent border-none outline-none text-[11px] font-bold absolute top-0 left-0 text-black";
 
   return (
     <div className="bg-gray-100 min-h-screen py-8 print:py-0 print:bg-white text-black font-sans">
       
+      <style type="text/css" media="print">
+        {`
+          @page {
+            size: A4;
+            margin: 0;
+          }
+          body {
+            margin: 0;
+            padding: 0;
+            -webkit-print-color-adjust: exact;
+          }
+          /* Hide headers/footers inserted by browser */
+          @media print {
+            body { -webkit-print-color-adjust: exact; }
+          }
+        `}
+      </style>
+
       {/* Action Bar */}
       <div className="container mx-auto max-w-[210mm] mt-10 flex justify-between print:hidden px-4">
         <button onClick={() => router.back()} className="px-4 py-2 bg-gray-700 text-white rounded shadow hover:bg-gray-800 text-sm flex items-center font-medium transition-colors">
@@ -200,10 +218,10 @@ export default function ContractPage() {
       </div>
 
       {/* Contract A4 Container */}
-      <div className="mx-auto bg-white shadow-2xl print:shadow-none !p-2 md:!px-[8mm] md:!py-[10mm] print:!px-[8mm] print:!py-[10mm] box-border relative flex flex-col w-full md:w-[210mm] print:w-[210mm] min-h-screen md:min-h-[297mm] print:min-h-[297mm]">
+      <div className="mx-auto bg-white shadow-2xl print:shadow-none !p-2 md:!px-[8mm] md:!py-[10mm] print:!px-4 print:!py-4 box-border relative flex flex-col w-full md:w-[210mm] print:w-[210mm] min-h-screen md:min-h-[297mm] print:min-h-[296mm] print:max-h-[297mm] print:overflow-hidden">
           
           {/* HEADER SECTION */}
-          <div className="flex flex-col md:flex-row print:flex-row justify-between items-center pb-4 mb-2 print:pb-2 print:mb-2 border-b-2 border-black gap-4 md:gap-0">
+          <div className="flex flex-col md:flex-row print:flex-row justify-between items-center pb-4 mb-2 print:pb-2 print:mb-2 border-black gap-4 md:gap-0">
                {/* Left: French Info */}
                <div className="text-center md:text-left w-full md:w-[40%] tracking-wide">
                    <h1 className="text-2xl md:text-3xl print:text-xl font-black uppercase tracking-tight mb-1 print:mb-0 leading-none text-black m-0">NARENOS CAR</h1>
@@ -215,7 +233,7 @@ export default function ContractPage() {
 
                 {/* Center: Logo */}
                 <div className="w-full md:w-[20%] flex justify-center items-center px-4">
-                    <div className="relative w-24 h-24 md:w-28 md:h-28 print:w-20 print:h-20">
+                    <div className="relative w-24 h-24 md:w-28 md:h-28 print:w-32 print:h-32">
                          <img 
                             src="/narenos-logo.jpg" 
                             alt="Narenos Logo" 
@@ -235,28 +253,24 @@ export default function ContractPage() {
                </div>
           </div>
           
-          {/* TITLE STRIP */}
-          <div className="flex justify-center items-center gap-4 md:gap-6 mb-6 print:mb-2 py-2 print:py-1">
-               <span className="font-black text-lg md:text-xl uppercase tracking-wider text-black">CONTRAT DE LOCATION</span>
-               <span className="font-black text-xl md:text-2xl text-black" style={{fontFamily: 'serif'}}>عقد كراء السيارات</span>
-          </div>
+         
 
           {/* MAIN BODY: 2 COLUMN LAYOUT */}
           <div className={`${mainBorder} flex flex-col md:flex-row print:flex-row flex-grow`}>
               
               {/* === LEFT COLUMN (60%) === */}
-              <div className={`w-full md:w-[60%] print:w-[60%] border-b-2 md:border-b-0 print:border-b-0 md:border-r-2 print:border-r-2 border-black p-3 print:p-1 flex flex-col gap-4 print:gap-2`}>
+              <div className={`w-full md:w-[60%] print:w-[60%] border-b-2 md:border-b-0 print:border-b-0 md:border-r-2 print:border-r-2 border-black p-3 print:p-1 flex flex-col gap-4 print:gap-1`}>
                   
                   {/* CAR DETAILS - BOXED */}
-                  <div className="border border-black overflow-hidden mb-2">
+                  <div className="border-2 border-black overflow-hidden ">
                        {[
                          {l:"Marque", a:"النوع", k:"car_brand"},
                          {l:"N° Immatriculation", a:"رقم التسجيل", k:"plate_number"},
                          {l:"Lieu de Livraison", a:"مكان التسليم", k:"delivery_place"},
                          {l:"Lieu de Reprise", a:"مكان الاسترجاع", k:"return_place"}
                        ].map((r, i) => (
-                         <div key={i} className="flex items-stretch w-full border-b border-black last:border-b-0">
-                             <div className="w-[35%] flex flex-col justify-center items-center px-2 py-1 bg-white border-r border-black">
+                         <div key={i} className="flex items-stretch w-full border-b-2 border-black last:border-b-0">
+                             <div className="w-[35%] flex flex-col justify-center items-center px-2 py-1 bg-white border-r-2 border-black">
                                  <span className="text-[9px] font-bold text-black leading-none text-center mb-0.5">{r.l}</span>
                                  <span className="text-[10px] font-bold text-black font-serif leading-none text-center">{r.a}</span>
                              </div>
@@ -270,12 +284,12 @@ export default function ContractPage() {
                   </div>
 
                   {/* LOCATAIRE */}
-                  <div className="flex flex-col gap-1 mb-2">
+                  <div className="flex flex-col gap-1 ">
                       <div className="flex justify-between items-end px-1 border-b-2 border-black pb-1 mb-1">
                           <span className="font-black text-xs uppercase tracking-widest text-black">LOCATAIRE</span>
                           <span className="font-bold text-sm text-black leading-none" style={{fontFamily:'serif'}}>المكتري</span>
                       </div>
-                      <div className="border border-black overflow-hidden">
+                      <div className="border-2 border-black overflow-hidden">
                           {[
                             {l:"Nom & Prénom", a:"الإسم العائلي والشخصي", k:"client_name", multiline: false},
                             {l:"Date de naissance", a:"تاريخ الازدياد", k:"birth_date"},
@@ -287,8 +301,8 @@ export default function ContractPage() {
                             {l:"Passeport N°", a:"جواز السفر", k:"passport"},
                             {l:"Date d'expiration", a:"تاريخ الانتهاء", k:"passport_expiry"},
                           ].map((r, i) => (
-                            <div key={i} className="flex items-stretch w-full border-b border-black last:border-b-0">
-                                <div className="w-[30%] flex flex-col justify-center items-center px-1 py-1 bg-white border-r border-black">
+                            <div key={i} className="flex items-stretch w-full border-b-2 border-black last:border-b-0">
+                                <div className="w-[30%] flex flex-col justify-center items-center px-1 py-1 bg-white border-r-2 border-black">
                                     <span className="text-[9px] font-bold text-black leading-none text-center mb-0.5">{r.l}</span>
                                     <span className="text-[10px] font-bold text-black font-serif leading-none text-center">{r.a}</span>
                                 </div>
@@ -319,7 +333,7 @@ export default function ContractPage() {
                           <span className="font-black text-xs uppercase tracking-widest text-black">CONDUCTEUR SUPPLEMENTAIRE</span>
                           <span className="font-bold text-sm text-black leading-none" style={{fontFamily:'serif'}}>السائق المرخص</span>
                       </div>
-                      <div className="border border-black overflow-hidden">
+                      <div className="border-2 border-black overflow-hidden">
                           {[
                             {l:"Nom & Prénom", a:"الإسم العائلي والشخصي", k:"second_driver_name"},
                             {l:"Permis de conduire N°", a:"رخصة السياقة رقم", k:"second_driver_license"},
@@ -327,8 +341,8 @@ export default function ContractPage() {
                             {l:"Passeport N°", a:"رقم جواز السفر", k:"second_driver_passport"},
                             {l:"C.I.N", a:"رقم البطاقة الوطنية", k:"second_driver_cin"},
                           ].map((r, i) => (
-                            <div key={i} className="flex items-stretch w-full border-b border-black last:border-b-0">
-                                <div className="w-[35%] flex flex-col justify-center items-center px-2 py-1 bg-white border-r border-black">
+                            <div key={i} className="flex items-stretch w-full border-b-2 border-black last:border-b-0">
+                                <div className="w-[35%] flex flex-col justify-center items-center px-2 py-1 bg-white border-r-2 border-black">
                                     <span className="text-[9px] font-bold text-black leading-none text-center mb-0.5">{r.l}</span>
                                     <span className="text-[10px] font-bold text-black font-serif leading-none text-center">{r.a}</span>
                                 </div>
@@ -339,18 +353,7 @@ export default function ContractPage() {
                                 </div>
                             </div>
                           ))}
-                          {/* Caution/Deposit Special Row */}
-                          <div className="flex items-stretch w-full border-t border-black">
-                                <div className="w-[35%] flex flex-col justify-center items-center px-2 py-1 bg-white border-r border-black">
-                                    <span className="text-[9px] font-bold text-black leading-none text-center mb-0.5">Caution</span>
-                                    <span className="text-[10px] font-bold text-black font-serif leading-none text-center">ضمانة</span>
-                                </div>
-                                <div className="flex-grow bg-white">
-                                    <input className="w-full h-full text-center text-[11px] font-bold text-black bg-transparent outline-none px-2 py-1" 
-                                           value={contractData.deposit} 
-                                           onChange={e => setContractData({...contractData, deposit: e.target.value})} />
-                                </div>
-                          </div>
+                         
                       </div>
                   </div>
 
@@ -360,11 +363,7 @@ export default function ContractPage() {
               <div className="w-full md:w-[40%] print:w-[40%] p-3 print:p-1 flex flex-col justify-start gap-2 print:gap-1">
                   
                   <div>
-                    {/* Warning Text */}
-                    <div className="text-[10px] text-right font-bold leading-snug mb-3 p-2 border border-black rounded" dir="rtl" style={{fontFamily:'serif'}}>
-                         <p className="mb-1 text-black">- بعد انتهاء صلاحية هذا العقد تعد السياقة غير قانونية ويعرض السائق للعقوبات الجاري بها العمل.</p>
-                         <p className="m-0 text-black">- لا يسمح لغير السائق المسجل في العقد سياقة هذه المركبة بدون حصول على إذن من الوكالة</p>
-                    </div>
+                    {/* Warning Text Removed */}
 
                     {/* Date Grid */}
                     <div className={`border-2 border-black mb-4 shadow-sm`}>
@@ -408,7 +407,7 @@ export default function ContractPage() {
                               {l:"Départ", a:"الانطلاق", f: 'start_date' as const},
                               {l:"Retour", a:"الرجوع", f: 'return_date' as const},
                             ].map((r, i) => (
-                              <div key={i} className="grid grid-cols-[25%_1fr_1fr_1fr_1fr_1fr] h-9 border-b border-black items-stretch">
+                              <div key={i} className="grid grid-cols-[25%_1fr_1fr_1fr_1fr_1fr] h-9 border-b-2 border-black items-stretch">
                                   <div className={`${gridHeaderStyle} flex-col !justify-center leading-none gap-0.5`}>
                                       <span>{r.l}</span><span style={{fontFamily:'serif'}}>{r.a}</span>
                                   </div>
@@ -422,7 +421,7 @@ export default function ContractPage() {
                         })()}
                         
                         {/* Retour Definitif (Manual/Empty) */}
-                        <div className="grid grid-cols-[25%_1fr_1fr_1fr_1fr_1fr] h-9 border-b border-black items-stretch">
+                        <div className="grid grid-cols-[25%_1fr_1fr_1fr_1fr_1fr] h-9 border-b-2 border-black items-stretch">
                               <div className={`${gridHeaderStyle} flex-col !justify-center leading-none gap-0.5`}>
                                   <span>Retour D&eacute;finitif</span><span style={{fontFamily:'serif'}}>الرجوع النهائي</span>
                               </div>
@@ -471,15 +470,15 @@ export default function ContractPage() {
                   </div>
 
                   {/* Diagram & Comments */}
-                  <div className="flex gap-2 h-[80mm] print:h-[50mm] mb-1 print:mb-0">
+                  <div className="flex justify-center h-[80mm] print:h-auto print:flex-grow mb-1 print:mb-0 border-black">
                        
                        {/* Left: Car Diagram - Exploded View */}
-                       <div className="w-[45%] relative flex justify-center pt-2">
+                       <div className="w-full relative flex justify-center pt-2">
                            <span className="absolute top-1 left-2 font-black text-xl z-10 leading-none text-black">AR</span>
                            <span className="absolute bottom-1 left-2 font-black text-xl z-10 leading-none text-black">AV</span>
                            
                            {/* Exploded View Diagram */}
-                           <svg viewBox="0 0 100 180" className="h-[95%] w-full overflow-visible p-2">
+                           <svg viewBox="0 0 100 180" className="h-[95%] print:h-full w-full overflow-visible p-2" preserveAspectRatio="xMidYMid meet">
                                 {/* Center - Roof/Cabin */}
                                 <path d="M25,60 L75,60 L75,120 L25,120 Z" fill="none" stroke="black" strokeWidth="1.5" />
                                 {/* Windshield Line */}
@@ -509,88 +508,14 @@ export default function ContractPage() {
                        </div>
 
                        {/* Right: Comments List */}
-                       <div className="w-[55%] pt-1 pl-1 flex flex-col">
-                           <h3 className="font-bold text-xs mb-1 text-right border-b border-black text-black inline-block self-end">Commentaires</h3>
-                           <p className="text-[9px] leading-tight mb-2 text-justify text-black">
-                               Positionner les Numeros à l'endroit précis du Dommage sur la matrice à droite.
-                           </p>
-                           <div className="flex flex-col gap-3 flex-grow">
-                               {[0,1,2,3,4].map((i) => (
-                                   <div key={i} className="flex gap-2 items-end w-full">
-                                       <div className="font-bold text-[11px] w-4 h-4 rounded-full bg-black text-white flex items-center justify-center flex-shrink-0">{i+1}</div>
-                                       <input className="flex-grow min-w-0 border-b border-black border-dotted bg-transparent outline-none text-[11px] px-1 text-black" 
-                                              value={contractData.comments[i]}
-                                              onChange={(e) => {
-                                                  const newComments = [...contractData.comments];
-                                                  newComments[i] = e.target.value;
-                                                  setContractData({...contractData, comments: newComments});
-                                              }} />
-                                   </div>
-                               ))}
-                           </div>
-                       </div>
+                       {/* Comments List Removed */}
                   </div>
 
               </div>
           </div>
           
-           {/* FOOTER SECTION: PAYMENTS & SIGNATURES */}
+           {/* FOOTER SECTION: SIGNATURES */}
            <div className="mt-2 text-black px-1">
- 
-                {/* PAYMENT SECTION - Unified Box */}
-                <div className="flex flex-col gap-1 mb-4">
-                    <div className="flex justify-between items-end mb-1 border-b-2 border-black pb-1">
-                        <span className="font-black text-sm uppercase text-black">PAIEMENT</span>
-                        <span className="font-bold text-sm text-black" style={{fontFamily:'serif'}}>الأداء</span>
-                    </div>
-                    
-                    <div className="border border-black overflow-hidden flex flex-col">
-                        {/* Row 1: Prices */}
-                        <div className="flex border-b border-black">
-                            {[
-                                {l:'TOTAL', sub:'Total', k:'total', a:'المجموع'},
-                                {l:'AVANCE', sub:'Avance', k:'advance', a:'التسبيق'},
-                                {l:'RESTE', sub:'Rest', k:'remaining', a:'الباقي'},
-                            ].map((item, i) => (
-                                <div key={i} className={`flex-1 flex items-stretch border-r border-black last:border-r-0`}>
-                                    <div className="w-[35%] flex flex-col justify-center items-center px-1 bg-white border-r border-black">
-                                        <span className="text-[9px] font-black text-black leading-none mb-0.5">{item.l}</span>
-                                        <span className="text-[10px] font-bold text-black font-serif leading-none">{item.a}</span>
-                                    </div>
-                                    <div className="flex-grow bg-white">
-                                        <input className="w-full h-full text-center font-black text-sm text-black bg-transparent outline-none px-1 py-2" 
-                                               value={(contractData as any)[item.k]}
-                                               onChange={e => setContractData({...contractData, [item.k]: e.target.value})} />
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
- 
-                        {/* Row 2: Payment Method */}
-                        <div className="flex items-stretch">
-                            <div className="w-[15%] flex flex-col justify-center items-center px-1 bg-white border-r border-black">
-                                <span className="text-[9px] font-bold text-black leading-none mb-0.5 text-center">MODE</span>
-                                <span className="text-[9px] font-bold text-black font-serif leading-none text-center">الأداء</span>
-                            </div>
-                            <div className="flex-grow bg-white flex items-center justify-around px-2 py-2">
-                                {[
-                                    {l:'En espèces', sub:'Cash', val:'cash'},
-                                    {l:'Chèque', sub:'Check', val:'check'},
-                                    {l:'Carte', sub:'Card', val:'card'},
-                                ].map((m, i) => (
-                                    <div key={i} className="flex items-center gap-2 cursor-pointer" onClick={() => setContractData({...contractData, payment_method: m.val})}>
-                                        <div className={`w-4 h-4 border border-black flex items-center justify-center ${contractData.payment_method === m.val ? 'bg-black' : 'bg-white'}`}>
-                                             {contractData.payment_method === m.val && <i className="bi bi-check text-white text-[10px]"></i>}
-                                        </div>
-                                        <div className="flex flex-col leading-none">
-                                             <span className="font-bold text-[10px] text-black uppercase">{m.l}</span>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-                </div>
  
                 {/* Signatures Row */}
                 <div>
