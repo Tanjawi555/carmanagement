@@ -195,26 +195,24 @@ export default function ContractPage() {
             size: A4;
             margin: 0;
           }
-          html, body {
+          body {
             margin: 0;
             padding: 0;
-            height: 100%;
-            overflow: hidden; /* Prevent scrolling/spillover */
-            -webkit-print-color-adjust: exact;
+            width: 100%;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
           }
-          /* Scale down slightly to ensure it fits safely on all printer margins */
+          /* Standardize print container to adapt to the page width provided by the device */
           @media print {
-            body { 
-              -webkit-print-color-adjust: exact; 
-              transform: scale(0.96); 
-              transform-origin: top center;
-              width: 100%;
-            }
             .print-container {
-               height: 295mm !important; /* Force slightly less than A4 height */
-               overflow: hidden !important;
-               page-break-after: avoid !important;
-               break-after: avoid !important;
+               width: 100%;
+               max-width: 100%;
+               margin: 0;
+               padding: 5mm !important; /* Safe zone */
+               box-sizing: border-box;
+               /* Force single page behavior */
+               height: 297mm;
+               overflow: hidden;
             }
           }
         `}
@@ -231,7 +229,7 @@ export default function ContractPage() {
       </div>
 
       {/* Contract A4 Container */}
-      <div className="print-container mx-auto bg-white shadow-2xl print:shadow-none !p-2 md:!px-[8mm] md:!py-[10mm] print:!px-2 print:!py-2 box-border relative flex flex-col w-full md:w-[210mm] print:w-[210mm] min-h-screen md:min-h-[297mm] print:min-h-0 print:h-[295mm]">
+      <div className="print-container mx-auto bg-white shadow-2xl print:shadow-none !p-2 md:!px-[8mm] md:!py-[10mm] print:!p-0 box-border relative flex flex-col w-full md:w-[210mm] print:w-full min-h-screen md:min-h-[297mm] print:min-h-0">
           
           {/* HEADER SECTION */}
           <div className="flex flex-col md:flex-row print:flex-row justify-between items-center pb-4 mb-2 print:pb-0 print:mb-1 border-black gap-4 md:gap-0">
@@ -275,23 +273,28 @@ export default function ContractPage() {
               <div className={`w-full md:w-[60%] print:w-[60%] border-b-2 md:border-b-0 print:border-b-0 md:border-r-2 print:border-r-2 border-black p-3 print:p-1 flex flex-col gap-4 print:gap-1`}>
                   
                   {/* CAR DETAILS - BOXED */}
-                  <div className="border-2 border-black overflow-hidden ">
+                  <div className="border-2 border-black overflow-hidden flex flex-col">
                        {[
                          {l:"Marque", a:"النوع", k:"car_brand"},
                          {l:"N° Immatriculation", a:"رقم التسجيل", k:"plate_number"},
                          {l:"Lieu de Livraison", a:"مكان التسليم", k:"delivery_place"},
                          {l:"Lieu de Reprise", a:"مكان الاسترجاع", k:"return_place"}
-                       ].map((r, i) => (
-                         <div key={i} className="flex items-stretch w-full border-b-2 border-black last:border-b-0">
-                             <div className="w-[35%] flex flex-col justify-center items-center px-2 py-1 bg-white border-r-2 border-black">
-                                 <span className="text-[9px] font-bold text-black leading-none text-center mb-0.5">{r.l}</span>
-                                 <span className="text-[10px] font-bold text-black font-serif leading-none text-center">{r.a}</span>
+                       ].map((r, i, arr) => (
+                         <div key={i} className="flex flex-col w-full">
+                             <div className="flex items-stretch w-full">
+                                 <div className="w-[35%] flex flex-col justify-center items-center px-2 py-1 bg-white border-r-2 border-black !border-black">
+                                     <span className="text-[9px] font-bold text-black leading-none text-center mb-0.5">{r.l}</span>
+                                     <span className="text-[10px] font-bold text-black font-serif leading-none text-center">{r.a}</span>
+                                 </div>
+                                 <div className="flex-grow bg-white">
+                                    <input className="w-full h-full text-center text-[11px] font-bold text-black bg-transparent outline-none px-2 py-1" 
+                                           value={(contractData as any)[r.k]} 
+                                           onChange={e => setContractData({...contractData, [r.k]: e.target.value})} />
+                                 </div>
                              </div>
-                             <div className="flex-grow bg-white">
-                                <input className="w-full h-full text-center text-[11px] font-bold text-black bg-transparent outline-none px-2 py-1" 
-                                       value={(contractData as any)[r.k]} 
-                                       onChange={e => setContractData({...contractData, [r.k]: e.target.value})} />
-                             </div>
+                             {/* Separator Line - Skip for last item if relying on container border, or keep to enforce. 
+                                 Using physical div ensures it prints. */}
+                             {i < arr.length - 1 && <div className="w-full h-[2px] bg-black print:bg-black shrink-0"></div>}
                          </div>
                        ))}
                   </div>
@@ -302,7 +305,7 @@ export default function ContractPage() {
                           <span className="font-black text-xs uppercase tracking-widest text-black">LOCATAIRE</span>
                           <span className="font-bold text-sm text-black leading-none" style={{fontFamily:'serif'}}>المكتري</span>
                       </div>
-                      <div className="border-2 border-black overflow-hidden">
+                      <div className="border-2 border-black overflow-hidden flex flex-col">
                           {[
                             {l:"Nom & Prénom", a:"الإسم العائلي والشخصي", k:"client_name", multiline: false},
                             {l:"Date de naissance", a:"تاريخ الازدياد", k:"birth_date"},
@@ -313,28 +316,31 @@ export default function ContractPage() {
                             {l:"C.I.N", a:"رقم البطاقة الوطنية", k:"cin"},
                             {l:"Passeport N°", a:"جواز السفر", k:"passport"},
                             {l:"Date d'expiration", a:"تاريخ الانتهاء", k:"passport_expiry"},
-                          ].map((r, i) => (
-                            <div key={i} className="flex items-stretch w-full border-b-2 border-black last:border-b-0">
-                                <div className="w-[30%] flex flex-col justify-center items-center px-1 py-1 bg-white border-r-2 border-black">
-                                    <span className="text-[9px] font-bold text-black leading-none text-center mb-0.5">{r.l}</span>
-                                    <span className="text-[10px] font-bold text-black font-serif leading-none text-center">{r.a}</span>
+                          ].map((r, i, arr) => (
+                            <div key={i} className="flex flex-col w-full">
+                                <div className="flex items-stretch w-full">
+                                    <div className="w-[30%] flex flex-col justify-center items-center px-1 py-1 bg-white border-r-2 border-black !border-black">
+                                        <span className="text-[9px] font-bold text-black leading-none text-center mb-0.5">{r.l}</span>
+                                        <span className="text-[10px] font-bold text-black font-serif leading-none text-center">{r.a}</span>
+                                    </div>
+                                    <div className="flex-grow bg-white min-h-[24px]">
+                                        {r.multiline ? (
+                                            <textarea 
+                                                className="w-full h-full text-center text-[11px] font-bold text-black bg-transparent outline-none px-2 py-1 resize-none overflow-hidden" 
+                                                rows={2}
+                                                value={(contractData as any)[r.k]} 
+                                                onChange={e => setContractData({...contractData, [r.k]: e.target.value})} 
+                                            />
+                                        ) : (
+                                            <input 
+                                                className="w-full h-full text-center text-[11px] font-bold text-black bg-transparent outline-none px-2 py-1" 
+                                                value={(contractData as any)[r.k]} 
+                                                onChange={e => setContractData({...contractData, [r.k]: e.target.value})} 
+                                            />
+                                        )}
+                                    </div>
                                 </div>
-                                <div className="flex-grow bg-white min-h-[24px]">
-                                    {r.multiline ? (
-                                        <textarea 
-                                            className="w-full h-full text-center text-[11px] font-bold text-black bg-transparent outline-none px-2 py-1 resize-none overflow-hidden" 
-                                            rows={2}
-                                            value={(contractData as any)[r.k]} 
-                                            onChange={e => setContractData({...contractData, [r.k]: e.target.value})} 
-                                        />
-                                    ) : (
-                                        <input 
-                                            className="w-full h-full text-center text-[11px] font-bold text-black bg-transparent outline-none px-2 py-1" 
-                                            value={(contractData as any)[r.k]} 
-                                            onChange={e => setContractData({...contractData, [r.k]: e.target.value})} 
-                                        />
-                                    )}
-                                </div>
+                                {i < arr.length - 1 && <div className="w-full h-[2px] bg-black print:bg-black shrink-0"></div>}
                             </div>
                           ))}
                       </div>
@@ -346,24 +352,27 @@ export default function ContractPage() {
                           <span className="font-black text-xs uppercase tracking-widest text-black">CONDUCTEUR SUPPLEMENTAIRE</span>
                           <span className="font-bold text-sm text-black leading-none" style={{fontFamily:'serif'}}>السائق المرخص</span>
                       </div>
-                      <div className="border-2 border-black overflow-hidden">
+                      <div className="border-2 border-black overflow-hidden flex flex-col">
                           {[
                             {l:"Nom & Prénom", a:"الإسم العائلي والشخصي", k:"second_driver_name"},
                             {l:"Permis de conduire N°", a:"رخصة السياقة رقم", k:"second_driver_license"},
                             {l:"Date d'expiration", a:"تاريخ الانتهاء", k:"second_driver_expiry"},
                             {l:"Passeport N°", a:"رقم جواز السفر", k:"second_driver_passport"},
                             {l:"C.I.N", a:"رقم البطاقة الوطنية", k:"second_driver_cin"},
-                          ].map((r, i) => (
-                            <div key={i} className="flex items-stretch w-full border-b-2 border-black last:border-b-0">
-                                <div className="w-[35%] flex flex-col justify-center items-center px-2 py-1 bg-white border-r-2 border-black">
-                                    <span className="text-[9px] font-bold text-black leading-none text-center mb-0.5">{r.l}</span>
-                                    <span className="text-[10px] font-bold text-black font-serif leading-none text-center">{r.a}</span>
+                          ].map((r, i, arr) => (
+                            <div key={i} className="flex flex-col w-full">
+                                <div className="flex items-stretch w-full">
+                                    <div className="w-[35%] flex flex-col justify-center items-center px-2 py-1 bg-white border-r-2 border-black !border-black">
+                                        <span className="text-[9px] font-bold text-black leading-none text-center mb-0.5">{r.l}</span>
+                                        <span className="text-[10px] font-bold text-black font-serif leading-none text-center">{r.a}</span>
+                                    </div>
+                                    <div className="flex-grow bg-white">
+                                        <input className="w-full h-full text-center text-[11px] font-bold text-black bg-transparent outline-none px-2 py-1" 
+                                               value={(contractData as any)[r.k]} 
+                                               onChange={e => setContractData({...contractData, [r.k]: e.target.value})} />
+                                    </div>
                                 </div>
-                                <div className="flex-grow bg-white">
-                                    <input className="w-full h-full text-center text-[11px] font-bold text-black bg-transparent outline-none px-2 py-1" 
-                                           value={(contractData as any)[r.k]} 
-                                           onChange={e => setContractData({...contractData, [r.k]: e.target.value})} />
-                                </div>
+                                {i < arr.length - 1 && <div className="w-full h-[2px] bg-black print:bg-black shrink-0"></div>}
                             </div>
                           ))}
                          
@@ -378,15 +387,16 @@ export default function ContractPage() {
                   <div>
                     {/* Warning Text Removed */}
 
-                    {/* Date Grid */}
-                    <div className={`border-2 border-black mb-4 shadow-sm`}>
-                        <div className="grid grid-cols-[25%_1fr_1fr_1fr_1fr_1fr] h-8 border-b-2 border-black bg-white">
-                            <div className={gridHeaderStyle}></div>
-                            <div className={gridHeaderStyle}>J</div>
-                            <div className={gridHeaderStyle}>M</div>
-                            <div className={gridHeaderStyle}>A</div>
-                            <div className={gridHeaderStyle}>H</div>
-                            <div className="h-full flex items-center justify-center font-bold text-[10px] text-black">mn</div>
+                    {/* Date Grid - Refactored to Gap-Method for perfect print lines */}
+                    <div className="border-2 border-black mb-4 shadow-sm bg-black flex flex-col gap-[2px]">
+                        {/* Header */}
+                        <div className="grid grid-cols-[25%_1fr_1fr_1fr_1fr_1fr] h-8 bg-black gap-[2px]">
+                            <div className="bg-white h-full flex items-center justify-center font-bold text-[9px] text-black"></div>
+                            <div className="bg-white h-full flex items-center justify-center font-bold text-[9px] text-black">J</div>
+                            <div className="bg-white h-full flex items-center justify-center font-bold text-[9px] text-black">M</div>
+                            <div className="bg-white h-full flex items-center justify-center font-bold text-[9px] text-black">A</div>
+                            <div className="bg-white h-full flex items-center justify-center font-bold text-[9px] text-black">H</div>
+                            <div className="bg-white h-full flex items-center justify-center font-bold text-[10px] text-black">mn</div>
                         </div>
                         
                         {/* Helper to update date parts */}
@@ -420,32 +430,36 @@ export default function ContractPage() {
                               {l:"Départ", a:"الانطلاق", f: 'start_date' as const},
                               {l:"Retour", a:"الرجوع", f: 'return_date' as const},
                             ].map((r, i) => (
-                              <div key={i} className="grid grid-cols-[25%_1fr_1fr_1fr_1fr_1fr] h-9 border-b-2 border-black items-stretch">
-                                  <div className={`${gridHeaderStyle} flex-col !justify-center leading-none gap-0.5`}>
+                              <div key={i} className="grid grid-cols-[25%_1fr_1fr_1fr_1fr_1fr] h-9 bg-black gap-[2px]">
+                                  <div className="bg-white h-full flex flex-col items-center justify-center font-bold text-[9px] text-black leading-none gap-0.5 border-none">
                                       <span>{r.l}</span><span style={{fontFamily:'serif'}}>{r.a}</span>
                                   </div>
-                                  <div className={gridCellStyle}><input className={gridInput} value={formatDatePart(contractData[r.f], 'day')} onChange={e=>updateDate(r.f, 'day', e.target.value)} /></div>
-                                  <div className={gridCellStyle}><input className={gridInput} value={formatDatePart(contractData[r.f], 'month')} onChange={e=>updateDate(r.f, 'month', e.target.value)} /></div>
-                                  <div className={gridCellStyle}><input className={gridInput} value={formatDatePart(contractData[r.f], 'year_short')} onChange={e=>updateDate(r.f, 'year', e.target.value)} /></div>
-                                  <div className={gridCellStyle}><input className={gridInput} value={formatDatePart(contractData[r.f], 'hour')} onChange={e=>updateDate(r.f, 'hour', e.target.value)} /></div>
-                                  <div className="h-full relative"><input className={gridInput} value={formatDatePart(contractData[r.f], 'minute')} onChange={e=>updateDate(r.f, 'minute', e.target.value)} /></div>
+                                  <div className="bg-white h-full relative"><input className={gridInput} value={formatDatePart(contractData[r.f], 'day')} onChange={e=>updateDate(r.f, 'day', e.target.value)} /></div>
+                                  <div className="bg-white h-full relative"><input className={gridInput} value={formatDatePart(contractData[r.f], 'month')} onChange={e=>updateDate(r.f, 'month', e.target.value)} /></div>
+                                  <div className="bg-white h-full relative"><input className={gridInput} value={formatDatePart(contractData[r.f], 'year_short')} onChange={e=>updateDate(r.f, 'year', e.target.value)} /></div>
+                                  <div className="bg-white h-full relative"><input className={gridInput} value={formatDatePart(contractData[r.f], 'hour')} onChange={e=>updateDate(r.f, 'hour', e.target.value)} /></div>
+                                  <div className="bg-white h-full relative"><input className={gridInput} value={formatDatePart(contractData[r.f], 'minute')} onChange={e=>updateDate(r.f, 'minute', e.target.value)} /></div>
                               </div>
                             ));
                         })()}
                         
                         {/* Retour Definitif (Manual/Empty) */}
-                        <div className="grid grid-cols-[25%_1fr_1fr_1fr_1fr_1fr] h-9 border-b-2 border-black items-stretch">
-                              <div className={`${gridHeaderStyle} flex-col !justify-center leading-none gap-0.5`}>
+                        <div className="grid grid-cols-[25%_1fr_1fr_1fr_1fr_1fr] h-9 bg-black gap-[2px]">
+                              <div className="bg-white h-full flex flex-col items-center justify-center font-bold text-[9px] text-black leading-none gap-0.5">
                                   <span>Retour D&eacute;finitif</span><span style={{fontFamily:'serif'}}>الرجوع النهائي</span>
                               </div>
-                              <div className={gridCellStyle}></div><div className={gridCellStyle}></div><div className={gridCellStyle}></div><div className={gridCellStyle}></div><div className="h-full relative"></div>
+                              <div className="bg-white h-full relative"></div>
+                              <div className="bg-white h-full relative"></div>
+                              <div className="bg-white h-full relative"></div>
+                              <div className="bg-white h-full relative"></div>
+                              <div className="bg-white h-full relative"></div>
                         </div>
 
-                        <div className="grid grid-cols-[25%_1fr] h-8 items-stretch bg-white">
-                            <div className={`${gridHeaderStyle} flex-col !justify-center leading-none gap-0.5`}>
+                        <div className="grid grid-cols-[25%_1fr] h-8 bg-black gap-[2px]">
+                            <div className="bg-white h-full flex flex-col items-center justify-center font-bold text-[9px] text-black leading-none gap-0.5">
                                 <span>Durée</span><span style={{fontFamily:'serif'}}>المدة</span>
                             </div>
-                            <div className="relative h-full"><input className={`${gridInput} font-black text-sm`} value={contractData.days} onChange={e=>setContractData({...contractData, days: e.target.value})} /></div>
+                            <div className="bg-white h-full relative"><input className={`${gridInput} font-black text-sm`} value={contractData.days} onChange={e=>setContractData({...contractData, days: e.target.value})} /></div>
                         </div>
                     </div>
 
