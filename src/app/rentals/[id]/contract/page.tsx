@@ -193,24 +193,24 @@ export default function ContractPage() {
         {`
           @page {
             size: A4;
-            margin: 0;
+            margin: 0mm;
           }
-          body {
+          html, body {
             margin: 0;
             padding: 0;
-            -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
             background-color: white;
+            width: 210mm;
+            height: 297mm;
+            overflow: hidden; /* Strict overflow hiding for single page */
           }
           @media print {
-            html, body {
-              width: 210mm;
-              height: 297mm;
-              overflow: hidden;
+            body { 
+               -webkit-print-color-adjust: exact !important;
+               print-color-adjust: exact !important;
             }
             .print-container {
                width: 210mm !important;
-               height: 297mm !important;
+               min-height: 297mm !important; 
                position: absolute;
                top: 0;
                left: 0;
@@ -218,17 +218,19 @@ export default function ContractPage() {
                padding: 5mm !important;
                box-sizing: border-box;
                background-color: white;
-               
-               /* Flex Layout to utilize space */
                display: flex;
                flex-direction: column;
-               
-               /* Critical: Fix for content overflowing or shrinking on mobile */
-               overflow: hidden;
-               
-               /* Slight scale to ensure borders don't trigger second page due to rounding */
-               transform: scale(0.99); 
-               transform-origin: top center;
+               justify-content: space-between;
+               overflow: visible; /* text overflow is better than clipped content */
+            }
+            /* Global Scale Down to ensure fit on mobile/iPhone */
+            .print-scale-wrapper {
+                transform: scale(0.95);
+                transform-origin: top center;
+                width: 100%;
+                height: 100%;
+                display: flex;
+                flex-direction: column;
             }
           }
         `}
@@ -245,10 +247,11 @@ export default function ContractPage() {
       </div>
 
       {/* Contract A4 Container */}
-      <div className="print-container mx-auto bg-white shadow-2xl print:shadow-none !p-2 md:!px-[8mm] md:!py-[10mm] box-border relative flex flex-col w-full md:w-[210mm] min-h-screen md:min-h-[297mm] print:min-h-0">
+      <div className="print-container mx-auto bg-white shadow-2xl print:shadow-none !p-2 md:!px-[8mm] md:!py-[5mm] box-border relative flex flex-col w-full md:w-[210mm] min-h-screen md:min-h-[297mm] print:min-h-0">
+        <div className="print-scale-wrapper">
           
           {/* HEADER SECTION */}
-          <div className="flex flex-col md:flex-row print:flex-row justify-between items-center pb-4 mb-2 print:pb-0 print:mb-1 border-black gap-4 md:gap-0">
+          <div className="flex flex-col md:flex-row print:flex-row justify-between items-center pb-4 mb-2 print:pb-0 print:mb-0 border-black gap-4 md:gap-0">
                {/* Left: French Info */}
                <div className="text-center md:text-left w-full md:w-[40%] tracking-wide">
                    <h1 className="text-2xl md:text-3xl print:text-xl font-black uppercase tracking-tight mb-1 print:mb-0 leading-none text-black m-0">NARENOS CAR</h1>
@@ -286,7 +289,7 @@ export default function ContractPage() {
           <div className={`${mainBorder} flex flex-col md:flex-row print:flex-row flex-grow`}>
               
               {/* === LEFT COLUMN (60%) === */}
-              <div className={`w-full md:w-[60%] print:w-[60%] border-b-2 md:border-b-0 print:border-b-0 md:border-r-2 print:border-r-2 border-black p-3 print:p-1 flex flex-col gap-4 print:gap-1`}>
+              <div className={`w-full md:w-[60%] print:w-[60%] border-b-2 md:border-b-0 print:border-b-0 md:border-r-2 print:border-r-2 border-black p-3 print:p-0.5 flex flex-col gap-4 print:gap-0.5`}>
                   
                   {/* CAR DETAILS - BOXED */}
                   <div className="border-2 border-black overflow-hidden flex flex-col">
@@ -398,7 +401,7 @@ export default function ContractPage() {
               </div>
 
               {/* === RIGHT COLUMN (40%) === */}
-              <div className="w-full md:w-[40%] print:w-[40%] p-3 print:p-1 flex flex-col justify-start gap-2 print:gap-1">
+              <div className="w-full md:w-[40%] print:w-[40%] p-3 print:p-0.5 flex flex-col justify-start gap-2 print:gap-0.5">
                   
                   <div>
                     {/* Warning Text Removed */}
@@ -513,7 +516,7 @@ export default function ContractPage() {
                   </div>
 
                   {/* Diagram & Comments */}
-                  <div className="flex justify-center h-[80mm] print:h-auto print:flex-grow mb-1 print:mb-0 border-black">
+                  <div className="flex justify-center h-[80mm] print:h-[55mm] mb-1 print:mb-0 border-black transition-all">
                        
                        {/* Left: Car Diagram - Exploded View */}
                        <div className="w-full relative flex justify-center pt-2">
@@ -632,6 +635,7 @@ export default function ContractPage() {
                </div>
 
           </div>
+      </div>
       </div>
       {/* Signature Modal */}
       {activeSignField && (
