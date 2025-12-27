@@ -1,6 +1,5 @@
 import { ObjectId } from 'mongodb';
 import { getDatabase } from './mongodb';
-import { BackupService } from './backup';
 
 export interface Car {
   _id?: ObjectId;
@@ -312,12 +311,6 @@ export const ClientModel = {
     };
     const result = await db.collection<Client>('clients').insertOne(doc);
 
-    // Backup
-    try {
-        const newClient = { ...doc, _id: result.insertedId };
-        await BackupService.saveClient(newClient);
-    } catch (e) { console.error('Backup failed', e); }
-
     return result;
   },
 
@@ -352,12 +345,6 @@ export const ClientModel = {
       { _id: new ObjectId(id) },
       { $set: updateData }
     );
-
-    // Backup
-    try {
-        const updatedClient = await db.collection<Client>('clients').findOne({ _id: new ObjectId(id) });
-        if (updatedClient) await BackupService.saveClient(updatedClient);
-    } catch (e) { console.error('Backup failed', e); }
 
     return result;
   },
@@ -968,3 +955,56 @@ export const ExpenseModel = {
 };
 
 
+export interface Document {
+  _id?: ObjectId;
+  client_id: ObjectId;
+  client_name: string;
+  url: string;
+  type: 'passport' | 'license' | 'other';
+  created_at: Date;
+}
+
+export const DocumentModel = {
+  async getAll(search?: string, dateFrom?: string, dateTo?: string) {
+    const db = await getDatabase();
+    const query: any = {};
+
+    if (search) {
+      query.client_name = { $regex: search, $options: 'i' };
+    }
+
+    if (dateFrom || dateTo) {
+      query.created_at = {};
+      if (dateFrom) query.created_at.$gte = new Date(dateFrom);
+      if (dateTo) {
+        const d = new Date(dateTo);
+        d.setHours(23, 59, 59, 999);
+        query.created_at.$lte = d;
+      }
+    }
+
+    return db.collection<Document>('documents').find(query).sort({ created_at: -1 }).toArray();
+  },
+
+  async create(doc: Omit<Document, '_id' | 'created_at'>) {
+    const db = await getDatabase();
+    const exists = await db.collection<Document>('documents').findOne({ url: doc.url });
+    if (exists) return null; 
+
+    const result = await db.collection<Document>('documents').insertOne({
+      ...doc,
+      created_at: new Date(),
+    });
+    return result;
+  },
+  
+  async deleteByUrl(url: string) {
+      const db = await getDatabase();
+      return db.collection('documents').deleteOne({ url });
+  },
+
+  async deleteByClientId(clientId: string) {
+      const db = await getDatabase();
+      return db.collection('documents').deleteMany({ client_id: new ObjectId(clientId) });
+  }
+};

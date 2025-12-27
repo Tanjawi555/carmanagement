@@ -12,6 +12,7 @@ export interface Translations {
   cars: string;
   clients: string;
   rentals: string;
+  documents: string;
   expenses: string;
   profits: string;
   total_clients: string;
@@ -125,6 +126,7 @@ const TRANSLATIONS: Record<Language, Translations> = {
     cars: 'السيارات',
     clients: 'العملاء',
     rentals: 'الإيجارات',
+    documents: 'المستندات',
     expenses: 'المصاريف',
     profits: 'الأرباح',
     total_clients: 'إجمالي العملاء',
@@ -236,6 +238,7 @@ const TRANSLATIONS: Record<Language, Translations> = {
     cars: 'Cars',
     clients: 'Clients',
     rentals: 'Rentals',
+    documents: 'Documents',
     expenses: 'Expenses',
     profits: 'Profits',
     total_clients: 'Total Clients',
@@ -347,6 +350,7 @@ const TRANSLATIONS: Record<Language, Translations> = {
     cars: 'Voitures',
     clients: 'Clients',
     rentals: 'Locations',
+    documents: 'Documents',
     expenses: 'Dépenses',
     profits: 'Bénéfices',
     total_clients: 'Total Clients',

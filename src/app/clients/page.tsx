@@ -107,11 +107,14 @@ export default function ClientsPage() {
     setTimeout(() => setMessage(null), 3000);
   };
 
-  const uploadToCloudinary = async (file: File): Promise<string | null> => {
+  const uploadToCloudinary = async (file: File, publicId?: string): Promise<string | null> => {
     const url = `https://api.cloudinary.com/v1_1/da0h6izcq/image/upload`;
     const formData = new FormData();
     formData.append('file', file);
     formData.append('upload_preset', 'narenos');
+    if (publicId) {
+        formData.append('public_id', publicId);
+    }
 
     try {
       const res = await fetch(url, {
@@ -137,24 +140,27 @@ export default function ClientsPage() {
     e.preventDefault();
     setUploading(true);
     try {
+    const getPublicId = (type: string, suffix: string) => {
+        const cleanName = formData.full_name.trim().replace(/[^a-zA-Z0-9]/g, '_') || 'client';
+        const dateStr = new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-');
+        return `${cleanName}_${type}_${suffix}_${dateStr}`;
+    };
+
       // Handle Passport Images
       let currentPassportImages = editingClient?.passport_image ? editingClient.passport_image.split(',') : [];
-      // Treat first item as Front, second as Back (if available). 
-      // Note: If previous data wasn't slot-strict, single images appear as Front. This is acceptable default.
       let passportFrontUrl = currentPassportImages[0] || '';
       let passportBackUrl = currentPassportImages[1] || '';
 
       if (passportFrontFile) {
-        const url = await uploadToCloudinary(passportFrontFile);
+        const url = await uploadToCloudinary(passportFrontFile, getPublicId('Passport', 'Front'));
         if (url) passportFrontUrl = url;
         else { setUploading(false); return; }
       }
       if (passportBackFile) {
-        const url = await uploadToCloudinary(passportBackFile);
+        const url = await uploadToCloudinary(passportBackFile, getPublicId('Passport', 'Back'));
         if (url) passportBackUrl = url;
         else { setUploading(false); return; }
       }
-      // Join with comma, preserving empty slots (e.g. ",url" or "url,"). If both empty, result is empty string.
       const passportArray = [passportFrontUrl, passportBackUrl];
       const passport_image = passportArray.every(u => !u) ? '' : passportArray.join(',');
 
@@ -164,12 +170,12 @@ export default function ClientsPage() {
       let licenseBackUrl = currentLicenseImages[1] || '';
 
       if (licenseFrontFile) {
-        const url = await uploadToCloudinary(licenseFrontFile);
+        const url = await uploadToCloudinary(licenseFrontFile, getPublicId('License', 'Front'));
         if (url) licenseFrontUrl = url;
         else { setUploading(false); return; }
       }
       if (licenseBackFile) {
-        const url = await uploadToCloudinary(licenseBackFile);
+        const url = await uploadToCloudinary(licenseBackFile, getPublicId('License', 'Back'));
         if (url) licenseBackUrl = url;
         else { setUploading(false); return; }
       }

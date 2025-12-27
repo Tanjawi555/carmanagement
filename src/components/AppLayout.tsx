@@ -66,6 +66,14 @@ export default function AppLayout({ children, t, currentLang, isRtl, onLanguageC
                     <span>{t.profits}</span>
                  </Link>
                </div>
+               <div className="col-6">
+                 <Link href="/documents" className="btn btn-outline-light text-dark border w-100 p-3 d-flex flex-column align-items-center gap-2" onClick={() => setShowMenu(false)}>
+                    <div className="bg-info bg-opacity-10 text-info rounded-circle p-2">
+                        <i className="bi bi-file-earmark-image fs-4"></i>
+                    </div>
+                    <span>{t.documents || 'Documents'}</span>
+                 </Link>
+               </div>
             </div>
 
             <hr className="my-4" />

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import { ClientModel } from '@/lib/models';
+import { ClientModel, DocumentModel } from '@/lib/models';
 
 export async function GET(request: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    await ClientModel.create(
+    const result = await ClientModel.create(
         full_name, 
         passport_id, 
         driving_license, 
@@ -45,8 +45,28 @@ export async function POST(request: NextRequest) {
         license_expiry_date,
         passport_expiry_date
     );
-    return NextResponse.json({ success: true });
+
+    // Save Documents
+    const saveDocs = async (str: string, type: 'passport' | 'license') => {
+        if (!str) return;
+        const urls = str.split(',').filter(u => u);
+        for (const url of urls) {
+            await DocumentModel.create({
+                client_id: result.insertedId,
+                client_name: full_name,
+                url,
+                type,
+                // created_at implicit in create
+            } as any);
+        }
+    };
+
+    await saveDocs(passport_image, 'passport');
+    await saveDocs(license_image, 'license');
+
+    return NextResponse.json({ success: true, id: result.insertedId });
   } catch (error) {
+    console.error('Create client error:', error);
     return NextResponse.json({ error: 'Failed to create client' }, { status: 500 });
   }
 }
@@ -71,6 +91,7 @@ export async function PUT(request: NextRequest) {
        const existingClient = await ClientModel.getById(id);
        if (existingClient) {
            try {
+             // Cloudinary Delete Logic... (retained)
              const { v2: cloudinary } = await import('cloudinary');
              if (process.env.CLOUDINARY_API_KEY && process.env.CLOUDINARY_API_SECRET) {
                 cloudinary.config({
@@ -81,13 +102,20 @@ export async function PUT(request: NextRequest) {
 
                 const deleteImage = async (url: string) => {
                     if (!url.includes('cloudinary.com')) return;
-                    const parts = url.split('/upload/');
-                    if (parts.length < 2) return;
-                    const versionAndId = parts[1].split('/');
-                    versionAndId.shift(); 
-                    const publicIdWithExt = versionAndId.join('/');
-                    const publicId = publicIdWithExt.split('.')[0]; 
-                    if (publicId) await cloudinary.uploader.destroy(publicId);
+                    
+                    const regex = /\/upload\/(?:v\d+\/)?(.+)/;
+                    const match = url.match(regex);
+                    if (!match || !match[1]) return;
+                    
+                    const publicIdWithExt = match[1];
+                    const lastDotIndex = publicIdWithExt.lastIndexOf('.');
+                    const publicId = lastDotIndex !== -1 ? publicIdWithExt.substring(0, lastDotIndex) : publicIdWithExt;
+
+                    if (publicId) {
+                        console.log(`PUT: Attempting to delete Cloudinary ID: ${publicId}`);
+                        await cloudinary.uploader.destroy(publicId);
+                        await DocumentModel.deleteByUrl(url);
+                    }
                 };
 
                 const deleteImagesIfReplaced = async (oldImagesStr: string | null | undefined, newImagesStr: string | null | undefined) => {
@@ -96,6 +124,7 @@ export async function PUT(request: NextRequest) {
                      const newImages = newImagesStr ? newImagesStr.split(',') : [];
                      
                      for (const oldUrl of oldImages) {
+                         // Check if URL is completely removed
                          if (!newImages.includes(oldUrl)) {
                              await deleteImage(oldUrl)
                          }
@@ -124,8 +153,27 @@ export async function PUT(request: NextRequest) {
         license_expiry_date,
         passport_expiry_date
     );
+
+    // Sync Documents
+    const { ObjectId } = await import('mongodb');
+    const saveDocs = async (str: string, type: 'passport' | 'license') => {
+        if (!str) return;
+        const urls = str.split(',').filter(u => u);
+        for (const url of urls) {
+            await DocumentModel.create({
+                client_id: new ObjectId(id),
+                client_name: full_name,
+                url,
+                type,
+            } as any);
+        }
+    };
+    await saveDocs(passport_image, 'passport');
+    await saveDocs(license_image, 'license');
+
     return NextResponse.json({ success: true });
   } catch (error) {
+    console.error('Update client error:', error);
     return NextResponse.json({ error: 'Failed to update client' }, { status: 500 });
   }
 }
@@ -152,7 +200,10 @@ export async function DELETE(request: NextRequest) {
         const { v2: cloudinary } = await import('cloudinary');
         
         // Configure only if env vars are present (to avoid crashing if not set)
-        if (process.env.CLOUDINARY_API_KEY && process.env.CLOUDINARY_API_SECRET) {
+        const hasKey = !!process.env.CLOUDINARY_API_KEY;
+        const hasSecret = !!process.env.CLOUDINARY_API_SECRET;
+
+        if (hasKey && hasSecret) {
             cloudinary.config({
                 cloud_name: 'da0h6izcq',
                 api_key: process.env.CLOUDINARY_API_KEY,
@@ -162,17 +213,28 @@ export async function DELETE(request: NextRequest) {
             // Helper to clean up images
             const deleteImage = async (url: string) => {
                 if (!url.includes('cloudinary.com')) return;
-                // Extract public_id from URL: .../upload/v1234/folder/public_id.ext -> folder/public_id
-                const parts = url.split('/upload/');
-                if (parts.length < 2) return;
+
+                // Robust extraction:
+                // URL example: https://res.cloudinary.com/cloud_name/image/upload/v12345/folder/my.image.jpg
+                const regex = /\/upload\/(?:v\d+\/)?(.+)/;
+                const match = url.match(regex);
+                if (!match || !match[1]) {
+                    console.log('Cloudinary Regex mismatch for:', url);
+                    return;
+                }
                 
-                const versionAndId = parts[1].split('/');
-                versionAndId.shift(); // remove v<version>
-                const publicIdWithExt = versionAndId.join('/');
-                const publicId = publicIdWithExt.split('.')[0]; // remove extension
+                const publicIdWithExt = match[1];
+                const lastDotIndex = publicIdWithExt.lastIndexOf('.');
+                const publicId = lastDotIndex !== -1 ? publicIdWithExt.substring(0, lastDotIndex) : publicIdWithExt;
 
                 if (publicId) {
-                    await cloudinary.uploader.destroy(publicId);
+                    try {
+                        const result = await cloudinary.uploader.destroy(publicId);
+                    } catch (err) {
+                        console.error('Cloudinary Destroy Error:', err);
+                    }
+                    
+                    await DocumentModel.deleteByUrl(url);
                 }
             };
             
@@ -194,6 +256,9 @@ export async function DELETE(request: NextRequest) {
           console.error('Failed to delete images from Cloudinary:', cloudinaryError);
           // Continue with client deletion even if image deletion fails
       }
+
+    // Delete documents from Mongo
+    await DocumentModel.deleteByClientId(id);
 
       // Legacy: Local file deletion (if any old files exist)
       try {
