@@ -241,9 +241,14 @@ export default function ContractPage() {
         <button onClick={() => router.back()} className="px-4 py-2 bg-gray-700 text-white rounded shadow hover:bg-gray-800 text-sm flex items-center font-medium transition-colors">
             <i className="bi bi-arrow-left mr-2"></i> Return
         </button>
-        <button onClick={handlePrint} className="px-4 py-2 bg-blue-700 text-white rounded shadow hover:bg-blue-800 text-sm flex items-center font-medium transition-colors">
-            <i className="bi bi-printer mr-2"></i> Print Contract
-        </button>
+        <div className="flex gap-2">
+            <button onClick={() => router.push(`/rentals/${id}/declaration`)} className="px-4 py-2 bg-indigo-600 text-white rounded shadow hover:bg-indigo-700 text-sm flex items-center font-medium transition-colors">
+                <i className="bi bi-file-text mr-2"></i> Declaration
+            </button>
+            <button onClick={handlePrint} className="px-4 py-2 bg-blue-700 text-white rounded shadow hover:bg-blue-800 text-sm flex items-center font-medium transition-colors">
+                <i className="bi bi-printer mr-2"></i> Print Contract
+            </button>
+        </div>
       </div>
 
       {/* Contract A4 Container */}
