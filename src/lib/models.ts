@@ -16,7 +16,6 @@ export interface Car {
   };
 }
 
-// ... (Client, Rental, Expense, User interfaces remain)
 
 
 
