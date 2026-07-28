@@ -103,9 +103,9 @@ export default function CarsPage() {
     }
   };
 
-  const fetchClients = async () => {
+  const fetchClients = async (search?: string) => {
       try {
-          const res = await fetch('/api/clients?limit=100'); // Fetch enough consumers
+          const res = await fetch(`/api/clients?limit=100&search=${encodeURIComponent(search || '')}`);
           if(res.ok) {
               const data = await res.json();
               if(data.clients) setClients(data.clients);
@@ -117,10 +117,18 @@ export default function CarsPage() {
   };
 
   useEffect(() => {
-    if (showReservationModal && clients.length === 0) {
-        fetchClients();
+    if (showReservationModal) {
+        fetchClients(clientSearch);
     }
   }, [showReservationModal]);
+
+  useEffect(() => {
+    if (!showReservationModal) return;
+    const timer = setTimeout(() => {
+        fetchClients(clientSearch);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [clientSearch]);
 
   // Sync client name when editing or viewing existing reservation
   useEffect(() => {
@@ -647,11 +655,9 @@ export default function CarsPage() {
                                     {showClientDropdown && (
                                         <div className="card position-absolute w-100 shadow-sm overflow-auto" style={{ zIndex: 1050, maxHeight: '200px', top: '100%' }}>
                                             <ul className="list-group list-group-flush">
-                                                {clients
-                                                    .filter(c => c.full_name.toLowerCase().includes(clientSearch.toLowerCase()))
-                                                    .map(client => (
-                                                    <li 
-                                                        key={client._id} 
+                                                {clients.map(client => (
+                                                    <li
+                                                        key={client._id}
                                                         className="list-group-item list-group-item-action cursor-pointer"
                                                         onMouseDown={(e) => {
                                                             e.preventDefault(); // Prevent blur before click
@@ -663,7 +669,7 @@ export default function CarsPage() {
                                                         {client.full_name}
                                                     </li>
                                                 ))}
-                                                {clients.filter(c => c.full_name.toLowerCase().includes(clientSearch.toLowerCase())).length === 0 && (
+                                                {clients.length === 0 && (
                                                     <li className="list-group-item text-muted small">No clients found</li>
                                                 )}
                                             </ul>
