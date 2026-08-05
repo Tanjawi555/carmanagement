@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import AppLayout from '@/components/AppLayout';
@@ -103,11 +103,16 @@ export default function CarsPage() {
     }
   };
 
+  const clientFetchSeq = useRef(0);
   const fetchClients = async (search?: string) => {
+      const seq = ++clientFetchSeq.current;
       try {
           const res = await fetch(`/api/clients?limit=100&search=${encodeURIComponent(search || '')}`);
           if(res.ok) {
               const data = await res.json();
+              // Ignore this response if a newer search has since been issued,
+              // so a slow response for an older term can't clobber fresher results.
+              if (seq !== clientFetchSeq.current) return;
               if(data.clients) setClients(data.clients);
               else if(Array.isArray(data)) setClients(data);
           }
