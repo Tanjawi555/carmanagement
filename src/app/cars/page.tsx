@@ -122,17 +122,19 @@ export default function CarsPage() {
     }
   }, [showReservationModal]);
 
-  // Sync client name when editing or viewing existing reservation
+  // Prefill the client search text once, when editing an existing reservation
+  // and the client list has just finished loading. This intentionally does NOT
+  // re-run on every keystroke/clients-array-change — doing so previously wiped
+  // out whatever the user was typing (Issue 2) and could paper over a stale
+  // client_id (Issue 1).
   useEffect(() => {
-    if (showReservationModal && reservationData.client_id && clients.length > 0) {
+    if (showReservationModal && reservationData.client_id && clients.length > 0 && !clientSearch) {
         const client = clients.find(c => c._id === reservationData.client_id);
         if (client) {
             setClientSearch(client.full_name);
         }
-    } else if (showReservationModal && !reservationData.client_id) {
-        setClientSearch('');
     }
-  }, [reservationData.client_id, clients, showReservationModal]);
+  }, [clients, showReservationModal]);
 
   const handleLanguageChange = (newLang: Language) => {
     setLang(newLang);
@@ -203,14 +205,19 @@ export default function CarsPage() {
     setModalMode(mode);
     
     if (mode === 'edit' && car.current_rental) {
+        const existingClientId = car.current_rental.client_id || '';
         setReservationData({
             _id: car.current_rental._id || '',
             car_id: car._id,
-            client_id: car.current_rental.client_id || '',
+            client_id: existingClientId,
             start_date: toBusinessInputString(car.current_rental.start_date),
             return_date: toBusinessInputString(car.current_rental.return_date),
             rental_price: (car.current_rental as any).rental_price ? (car.current_rental as any).rental_price.toString() : ''
         });
+        // Prefill immediately if the client list is already loaded; otherwise
+        // the useEffect above fills it in once fetchClients() resolves.
+        const existingClient = clients.find(c => c._id === existingClientId);
+        setClientSearch(existingClient ? existingClient.full_name : '');
     } else {
         setReservationData({
             _id: '',
@@ -220,12 +227,18 @@ export default function CarsPage() {
             return_date: toBusinessInputString(new Date(Date.now() + 24 * 60 * 60 * 1000)),
             rental_price: ''
         });
+        setClientSearch('');
     }
+    setShowClientDropdown(false);
     setShowReservationModal(true);
   };
 
   const handleReservationSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!reservationData.client_id) {
+        showMessage_('danger', 'Please select a client from the search results.');
+        return;
+    }
     try {
         let url = '/api/rentals';
         let method = 'POST';
@@ -638,8 +651,11 @@ export default function CarsPage() {
                                         onChange={(e) => {
                                             setClientSearch(e.target.value);
                                             setShowClientDropdown(true);
-                                            // Optional: reset client_id if user modifies text, forcing re-selection
-                                            // setReservationData({ ...reservationData, client_id: '' }); 
+                                            // Editing the text invalidates any previously selected client so a
+                                            // stale client_id can never be submitted for a different displayed name.
+                                            if (reservationData.client_id) {
+                                                setReservationData({ ...reservationData, client_id: '' });
+                                            }
                                         }}
                                         onFocus={() => setShowClientDropdown(true)}
                                         onBlur={() => setTimeout(() => setShowClientDropdown(false), 200)}
